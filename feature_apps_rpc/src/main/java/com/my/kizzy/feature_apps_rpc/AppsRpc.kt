@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -58,6 +59,7 @@ import com.my.kizzy.resources.R
 import com.my.kizzy.ui.components.AppsItem
 import com.my.kizzy.ui.components.BackButton
 import com.my.kizzy.ui.components.SearchBar
+import com.my.kizzy.ui.components.Subtitle
 import com.my.kizzy.ui.components.SwitchBar
 import com.my.kizzy.ui.components.preference.PreferencesHint
 
@@ -169,6 +171,14 @@ fun AppsRPC(
                                 )
                             }
                         }
+                    }
+                    item {
+                        Subtitle(
+                            text = "Apps",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp, 8.dp)
+                        )
                     }
                     items(
                         state.apps.size,

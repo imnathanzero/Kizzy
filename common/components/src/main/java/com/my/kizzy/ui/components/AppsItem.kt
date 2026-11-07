@@ -22,13 +22,15 @@ import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.SportsMma
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SuggestionChipDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,10 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.blankj.utilcode.util.AppUtils
 
@@ -53,45 +56,83 @@ fun AppsItem(
     activityType: Int? = null,
     onActivityTypeChange: ((Int) -> Unit)? = null,
 ) {
-    Surface(
-        modifier = Modifier.clickable {
-            onClick()
-        }
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            AsyncImage(
-                model = AppUtils.getAppIcon(pkg),
-                contentDescription = null,
+            Row(
                 modifier = Modifier
-                    .size(60.dp)
-                    .padding(6.dp),
-            )
-
-            Column(
-                modifier = Modifier.weight(1f)
+                    .fillMaxWidth()
+                    .clickable { onClick() }
+                    .padding(16.dp, 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = name,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    overflow = TextOverflow.Ellipsis
+                AsyncImage(
+                    model = AppUtils.getAppIcon(pkg),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(10.dp)),
                 )
-                if (pkg.isNotEmpty()) {
+
+                Spacer(modifier = Modifier.width(14.dp))
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = pkg,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = name,
                         maxLines = 1,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis
                     )
+                    if (pkg.isNotEmpty()) {
+                        Text(
+                            text = pkg,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            style = MaterialTheme.typography.bodySmall,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
-                if (activityType != null && onActivityTypeChange != null) {
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                KSwitch(
+                    checked = isChecked,
+                    onClick = onClick
+                )
+            }
+
+            if (activityType != null && onActivityTypeChange != null) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 0.5.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Activity Type",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
                     var expanded by remember { mutableStateOf(false) }
                     val currentType = activityType
                     val typeLabel = when (currentType) {
@@ -119,7 +160,7 @@ fun AppsItem(
                         else -> MaterialTheme.colorScheme.primary
                     }
 
-                    Box(modifier = Modifier.padding(top = 4.dp)) {
+                    Box {
                         SuggestionChip(
                             onClick = { expanded = true },
                             label = {
@@ -132,12 +173,12 @@ fun AppsItem(
                                 Icon(
                                     imageVector = typeIcon,
                                     contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(16.dp),
                                     tint = typeColor
                                 )
                             },
                             colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = typeColor.copy(alpha = 0.12f),
+                                containerColor = typeColor.copy(alpha = 0.15f),
                                 labelColor = typeColor
                             ),
                             border = SuggestionChipDefaults.suggestionChipBorder(
@@ -160,7 +201,12 @@ fun AppsItem(
                                 5 to "Competing"
                             ).forEach { (typeVal, label) ->
                                 DropdownMenuItem(
-                                    text = { Text(text = label) },
+                                    text = {
+                                        Text(
+                                            text = label,
+                                            fontWeight = if (currentType == typeVal) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
                                     leadingIcon = {
                                         val icon = when (typeVal) {
                                             0 -> Icons.Default.SportsEsports
@@ -187,10 +233,6 @@ fun AppsItem(
                     }
                 }
             }
-            KSwitch(
-                checked = isChecked,
-                modifier = Modifier.padding(start = 12.dp, end = 6.dp),
-            )
         }
     }
 }
