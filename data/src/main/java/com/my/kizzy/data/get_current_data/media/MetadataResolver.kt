@@ -28,6 +28,7 @@ class MetadataResolver @Inject constructor() {
         val uri = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
             ?: metadata.getString(MediaMetadata.METADATA_KEY_ART_URI)
             ?: metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI)
+            ?: metadata.description?.iconUri?.toString()
         return uri?.takeIf { it.startsWith("http://") || it.startsWith("https://") }
     }
 

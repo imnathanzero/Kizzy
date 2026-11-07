@@ -185,7 +185,7 @@ class MediaRpcService : Service() {
 
         scope.coroutineContext.cancelChildren()
         scope.launch {
-            if (isEvent) delay(1500)
+            if (isEvent) delay(300)
             val sessions = mediaSessionManager.getActiveSessions(ComponentName(this@MediaRpcService, NotificationListener::class.java))
             if (sessions.isNotEmpty()) {
                 currentMediaController?.unregisterCallback(mediaControllerCallback)
@@ -208,7 +208,7 @@ class MediaRpcService : Service() {
             // Cancel all previous jobs and start new job to prevent conflict/spam
             scope.coroutineContext.cancelChildren()
             scope.launch {
-                delay(1000)
+                delay(300)
                 updatePresence()
             }
         }
@@ -217,7 +217,7 @@ class MediaRpcService : Service() {
 
             scope.coroutineContext.cancelChildren()
             scope.launch {
-                delay(1000)
+                delay(300)
                 updatePresence()
             }
         }

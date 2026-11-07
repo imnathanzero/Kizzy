@@ -97,6 +97,7 @@ class GetCurrentPlayingMedia @Inject constructor(
             if (title != null) {
                 val appIcon = RpcImage.ApplicationIcon(mediaController.packageName, context)
                 largeIcon = when {
+                    artUrl != null -> RpcImage.ExternalImage(artUrl)
                     bitmap != null -> RpcImage.BitmapImage(
                         context = context,
                         bitmap = bitmap,
@@ -104,7 +105,6 @@ class GetCurrentPlayingMedia @Inject constructor(
                         // <Main artist>|<Album>|<Title>
                         title = "${metadata.let { metadataResolver.getAlbumArtists(it) }}|${metadata.let { metadataResolver.getAlbum(it) }?: "unknown"}|${title}"
                     )
-                    artUrl != null -> RpcImage.ExternalImage(artUrl)
                     else -> appIcon
                 }
 

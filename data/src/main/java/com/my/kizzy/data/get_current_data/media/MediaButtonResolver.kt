@@ -113,6 +113,9 @@ object MediaButtonResolver {
                 if (mediaUri != null && mediaUri.startsWith("https://soundcloud.com/") && !mediaUri.contains("/search")) {
                     return "Listen on SoundCloud" to mediaUri
                 }
+                if (mediaId != null && mediaId.startsWith("https://soundcloud.com/") && !mediaId.contains("/search")) {
+                    return "Listen on SoundCloud" to mediaId
+                }
             }
         }
 
@@ -229,17 +232,34 @@ object MediaButtonResolver {
     }
 
     private fun fetchSoundCloudTrackUrl(encodedQuery: String): String? {
-        val html = fetchText("https://soundcloud.com/search?q=$encodedQuery", timeoutMs = 2500)
-            ?: return null
-        val matches = SOUNDCLOUD_HREF_REGEX.findAll(html)
-        for (match in matches) {
-            val path = match.groupValues[1]
-            val firstSegment = path.substringBefore("/")
-            if (firstSegment !in SOUNDCLOUD_EXCLUDED_PATHS) {
-                return "https://soundcloud.com/$path"
+        return try {
+            val url = URL("https://soundcloud.com/search?q=$encodedQuery")
+            val conn = (url.openConnection() as HttpURLConnection).apply {
+                connectTimeout = 1200
+                readTimeout = 1200
+                instanceFollowRedirects = true
+                setRequestProperty(
+                    "User-Agent",
+                    "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+                )
+                setRequestProperty("Accept", "*/*")
             }
+            conn.inputStream.bufferedReader().useLines { lines ->
+                for (line in lines) {
+                    val match = SOUNDCLOUD_HREF_REGEX.find(line)
+                    if (match != null) {
+                        val path = match.groupValues[1]
+                        val firstSegment = path.substringBefore("/")
+                        if (firstSegment !in SOUNDCLOUD_EXCLUDED_PATHS) {
+                            return "https://soundcloud.com/$path"
+                        }
+                    }
+                }
+            }
+            null
+        } catch (_: Exception) {
+            null
         }
-        return null
     }
 
     private fun fetchText(urlStr: String, timeoutMs: Int): String? {
