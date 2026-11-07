@@ -98,7 +98,7 @@ fun GamesScreen(
     var selected by remember {
         mutableStateOf(
             lastRunRpcConfig?.let {
-                if (it.name.isNotEmpty() && it.name != "Xbox") it.name else it.details
+                if (it.details.isNotEmpty()) it.details else it.name
             } ?: ""
         )
     }
@@ -211,12 +211,21 @@ fun GamesScreen(
                                         } catch (_: Exception) {
                                             null
                                         }
-                                        if (config != null) {
-                                            val gameTitle = if (config.name.isNotEmpty() && config.name != "Xbox") config.name else config.details
+                                        val activeGame = state.games.find { it.game_title == selected }
+                                            ?: config?.let { c ->
+                                                val title = if (c.details.isNotEmpty()) c.details else c.name
+                                                state.games.find { it.game_title == title }
+                                            }
+                                        if (activeGame != null) {
+                                            Json.encodeToString(buildGameRpcConfig(activeGame, selectedPlatform))
+                                        } else if (config != null) {
+                                            val gameTitle = if (config.details.isNotEmpty()) config.details else config.name
+                                            val effName = selectedPlatform.consoleName ?: gameTitle
+                                            val effDetails = if (selectedPlatform.consoleName != null) gameTitle else ""
                                             Json.encodeToString(
                                                 config.copy(
-                                                    name = gameTitle,
-                                                    details = "",
+                                                    name = effName,
+                                                    details = effDetails,
                                                     smallImg = selectedPlatform.smallIcon ?: "",
                                                     smallText = selectedPlatform.smallText ?: "",
                                                     platform = ""
@@ -304,6 +313,7 @@ fun GamesScreen(
                                 SingleChoiceGameItem(
                                     game = game,
                                     selected = game.game_title == selected,
+                                    platformTitle = if (selectedPlatform != GamePlatform.NONE) selectedPlatform.title else null,
                                     badgeIcon = selectedPlatform.smallIcon
                                 ) { info ->
                                     selected = game.game_title
@@ -343,6 +353,7 @@ fun GamesScreen(
 fun SingleChoiceGameItem(
     game: Game,
     selected: Boolean,
+    platformTitle: String? = null,
     badgeIcon: String? = null,
     onClick: (game: Game) -> Unit,
 ) {
@@ -404,7 +415,7 @@ fun SingleChoiceGameItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Playing Game",
+                    text = platformTitle ?: "Playing Game",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )
