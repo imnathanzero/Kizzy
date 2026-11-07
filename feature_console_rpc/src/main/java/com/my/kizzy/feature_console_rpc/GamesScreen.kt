@@ -83,8 +83,19 @@ fun GamesScreen(
     serviceEnabled: Boolean,
     isSearchBarVisible: Boolean,
 ) {
+    val lastRunRpcString = remember { Prefs[Prefs.LAST_RUN_CONSOLE_RPC, ""] }
+    val lastRunRpcConfig = remember(lastRunRpcString) {
+        if (lastRunRpcString.isNotEmpty()) {
+            try {
+                Json.decodeFromString<RpcConfig>(lastRunRpcString)
+            } catch (_: Exception) {
+                null
+            }
+        } else null
+    }
+
     var selected by remember {
-        mutableStateOf("")
+        mutableStateOf(lastRunRpcConfig?.details ?: "")
     }
 
     val context = LocalContext.current
@@ -93,7 +104,13 @@ fun GamesScreen(
     }
     var searchText by remember { mutableStateOf("") }
 
-    val intent = Intent(context, CustomRpcService::class.java)
+    val intent = remember {
+        Intent(context, CustomRpcService::class.java).apply {
+            if (lastRunRpcString.isNotEmpty()) {
+                putExtra("RPC", lastRunRpcString)
+            }
+        }
+    }
     Scaffold(
         Modifier.fillMaxSize(),
         topBar = {
@@ -176,6 +193,9 @@ fun GamesScreen(
                             isConsoleRpcRunning = !isConsoleRpcRunning
                             when (isConsoleRpcRunning) {
                                 true -> {
+                                    if (!intent.hasExtra("RPC") && lastRunRpcString.isNotEmpty()) {
+                                        intent.putExtra("RPC", lastRunRpcString)
+                                    }
                                     if (intent.hasExtra("RPC")) {
                                         Prefs[Prefs.LAST_RUN_CONSOLE_RPC] =
                                             intent.getStringExtra("RPC")
@@ -198,6 +218,8 @@ fun GamesScreen(
                                             )
                                         )
                                         context.startService(intent)
+                                    } else {
+                                        isConsoleRpcRunning = false
                                     }
                                 }
 
