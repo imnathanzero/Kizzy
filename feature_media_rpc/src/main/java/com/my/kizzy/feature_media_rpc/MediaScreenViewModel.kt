@@ -43,15 +43,30 @@ class MediaScreenViewModel @Inject constructor(
                 isEnabled = Prefs::isMediaAppEnabled
             ).sortedBy { !it.isChecked }
             val enabledApps = appList.associate { it.pkg to it.isChecked }
+            val savedActivityTypes = Prefs.getAppActivityTypes()
+            val appActivityTypes = appList.associate { it.pkg to (savedActivityTypes[it.pkg] ?: Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2]) }
             _state.update {
                 MediaAppsState(
                     apps = appList,
                     isLoading = false,
-                    enabledApps = enabledApps
+                    enabledApps = enabledApps,
+                    appActivityTypes = appActivityTypes
                 )
             }
         }
+    }
 
+    fun setAppActivityType(pkg: String, type: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            Prefs.saveAppActivityType(pkg, type)
+            _state.update { currentState ->
+                currentState.copy(
+                    appActivityTypes = currentState.appActivityTypes.toMutableMap().apply {
+                        this[pkg] = type
+                    }
+                )
+            }
+        }
     }
 
     fun updateMediaAppEnabled(pkg: String) {

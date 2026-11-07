@@ -274,15 +274,16 @@ class KizzyRPC(
     }
 
     suspend fun build() {
+        val isGame = type == 0
         presence = Presence(
             activities = listOf(
                 Activity(
                     name = activityName,
                     state = state?.sanitize(),
                     details = details?.sanitize(),
-                    party = party.takeIf { party != null },
+                    party = party.takeIf { isGame && party != null },
                     type = type,
-                    platform = platform?.sanitize(),
+                    platform = platform?.sanitize()?.takeIf { isGame },
                     timestamps = Timestamps(
                         start = startTimestamps,
                         end = stopTimestamps
@@ -293,14 +294,14 @@ class KizzyRPC(
                         largeText = largeText?.sanitize(),
                         smallText = smallText?.sanitize()
                     ).takeIf { largeImage != null || smallImage != null },
-                    buttons = buttons.takeIf { buttons.size > 0 },
-                    metadata = Metadata(buttonUrls = buttonUrl).takeIf { buttonUrl.size > 0 },
-                    applicationId = applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID,
+                    buttons = buttons.takeIf { isGame && buttons.size > 0 },
+                    metadata = Metadata(buttonUrls = buttonUrl).takeIf { isGame && buttonUrl.size > 0 },
+                    applicationId = if (isGame) (applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID) else null,
                     url = url
                 )
             ),
             afk = true,
-            since = startTimestamps.takeIf { startTimestamps != null }?: System.currentTimeMillis(),
+            since = if (status == "idle") (startTimestamps ?: System.currentTimeMillis()) else null,
             status = status
         )
         connectToWebSocket()
@@ -322,6 +323,8 @@ class KizzyRPC(
             Timestamps(end = commonRpc.time.end, start = commonRpc.time.start).also { time = it }
         if (commonRpc.partyCurrentSize != null && commonRpc.partyMaxSize != null)
             Party(id = "kizzy", size = arrayOf(commonRpc.partyCurrentSize, commonRpc.partyMaxSize)).also { party = it }
+        val activityType = commonRpc.type ?: Prefs[CUSTOM_ACTIVITY_TYPE, 0]
+        val isGame = activityType == 0
         discordWebSocket.sendActivity(
             Presence(
                 activities = listOf(
@@ -329,8 +332,8 @@ class KizzyRPC(
                         name = commonRpc.name,
                         details = commonRpc.details?.takeIf { it.isNotEmpty() }?.sanitize(),
                         state = commonRpc.state?.takeIf { it.isNotEmpty() }?.sanitize(),
-                        type = commonRpc.type ?: Prefs[CUSTOM_ACTIVITY_TYPE, 0],
-                        platform = commonRpc.platform?.sanitize(),
+                        type = activityType,
+                        platform = commonRpc.platform?.sanitize()?.takeIf { isGame },
                         timestamps = time.takeIf { enableTimestamps == true },
                         assets = Assets(
                                 largeImage = commonRpc.largeImage?.resolveImage(kizzyRepository),
@@ -338,15 +341,14 @@ class KizzyRPC(
                                 largeText = commonRpc.largeText?.sanitize(),
                                 smallText = commonRpc.smallText?.sanitize()
                             ).takeIf { commonRpc.largeImage != null || commonRpc.smallImage != null },
-                        party = party.takeIf { party != null },
-                        buttons = buttons.takeIf { buttons.size > 0 },
-                        metadata = Metadata(buttonUrls = buttonUrl).takeIf { buttonUrl.size > 0 },
-                        applicationId = applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID
-
+                        party = party.takeIf { isGame && party != null },
+                        buttons = buttons.takeIf { isGame && buttons.size > 0 },
+                        metadata = Metadata(buttonUrls = buttonUrl).takeIf { isGame && buttonUrl.size > 0 },
+                        applicationId = if (isGame) (applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID) else null
                     )
                 ),
                 afk = true,
-                since = startTimestamps,
+                since = if (this.status == "idle") (startTimestamps ?: System.currentTimeMillis()) else null,
                 status = this.status
             )
         )

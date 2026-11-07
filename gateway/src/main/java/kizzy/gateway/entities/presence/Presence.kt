@@ -10,7 +10,7 @@ data class Presence(
     @SerialName("afk")
     val afk: Boolean? = true,
     @SerialName("since")
-    val since: Long? = 0L,
+    val since: Long? = null,
     @SerialName("status")
     val status: String? = "online"
 )

@@ -112,10 +112,14 @@ class GetCurrentPlayingMedia @Inject constructor(
                     smallText = null
                 }
 
+                val savedAppActivityTypes = Prefs.getAppActivityTypes()
+                val mediaType = savedAppActivityTypes[mediaController.packageName]
+                    ?: Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2]
+
                 return if (Prefs[Prefs.MEDIA_RPC_SHOW_SONG_AS_TITLE, false]) {
                     CommonRpc(
                         name = title,
-                        type = 2,
+                        type = mediaType,
                         details = author,
                         state = album,
                         largeImage = largeIcon,
@@ -128,7 +132,7 @@ class GetCurrentPlayingMedia @Inject constructor(
                 } else {
                     CommonRpc(
                         name = appName,
-                        type = 2,
+                        type = mediaType,
                         details = title,
                         state = author,
                         largeImage = largeIcon,

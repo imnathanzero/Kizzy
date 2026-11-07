@@ -39,9 +39,11 @@ open class DiscordWebSocketImpl(
     private var client: HttpClient = HttpClient {
         install(WebSockets)
     }
-    private val json = Json{
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
+        explicitNulls = false
     }
 
     override val coroutineContext: CoroutineContext

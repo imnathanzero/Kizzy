@@ -69,6 +69,7 @@ fun AppsRPC(
     updateAppEnabled: (String) -> Unit,
     onBackPressed: () -> Unit,
     hasUsageAccess: Boolean,
+    updateAppActivityType: (String, Int) -> Unit = { _, _ -> },
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState(),
@@ -182,7 +183,11 @@ fun AppsRPC(
                                 name = state.apps[i].name,
                                 pkg = state.apps[i].pkg,
                                 isChecked = state.enabledApps[state.apps[i].pkg] ?: false,
-                                onClick = { updateAppEnabled(state.apps[i].pkg) }
+                                onClick = { updateAppEnabled(state.apps[i].pkg) },
+                                activityType = state.appActivityTypes[state.apps[i].pkg] ?: 0,
+                                onActivityTypeChange = { newType ->
+                                    updateAppActivityType(state.apps[i].pkg, newType)
+                                }
                             )
                         } else {
                             Spacer(modifier = Modifier.height(0.dp))

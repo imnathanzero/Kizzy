@@ -73,8 +73,11 @@ import com.my.kizzy.ui.components.BackButton
 import com.my.kizzy.ui.components.SearchBar
 import com.my.kizzy.ui.components.Subtitle
 import com.my.kizzy.ui.components.SwitchBar
+import com.my.kizzy.ui.components.preference.PreferenceSingleChoiceItem
 import com.my.kizzy.ui.components.preference.PreferenceSwitch
 import com.my.kizzy.ui.components.preference.PreferencesHint
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,6 +86,7 @@ fun MediaRPC(
     state: MediaAppsState,
     hasNotificationAccess: Boolean,
     updateMediaAppEnabled: (String) -> Unit,
+    updateMediaAppActivityType: (String, Int) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
     var mediaRpcRunning by remember { mutableStateOf(AppUtils.mediaRpcRunning()) }
@@ -93,6 +97,10 @@ fun MediaRPC(
     var hideOnPause by remember { mutableStateOf(Prefs[MEDIA_RPC_HIDE_ON_PAUSE, false]) }
     var isShowPlaybackState by remember { mutableStateOf(Prefs[MEDIA_RPC_SHOW_PLAYBACK_STATE, false]) }
     var showSongAsTitle by remember { mutableStateOf(Prefs[Prefs.MEDIA_RPC_SHOW_SONG_AS_TITLE, false]) }
+    var selectedActivityType by remember {
+        mutableStateOf(Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2])
+    }
+    var showActivityTypeDialog by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState(),
@@ -246,6 +254,21 @@ fun MediaRPC(
                     }
                 }
                 item {
+                    val activityTypeLabel = when (selectedActivityType) {
+                        0 -> "Playing"
+                        1 -> "Streaming"
+                        2 -> "Listening (Default)"
+                        3 -> "Watching"
+                        5 -> "Competing"
+                        else -> "Listening"
+                    }
+                    PreferenceSingleChoiceItem(
+                        text = "Default Activity: $activityTypeLabel",
+                        selected = true,
+                        onClick = { showActivityTypeDialog = true }
+                    )
+                }
+                item {
                     Subtitle(
                         text = "Apps",
                         modifier = Modifier
@@ -273,7 +296,11 @@ fun MediaRPC(
                                 name = state.apps[i].name,
                                 pkg = state.apps[i].pkg,
                                 isChecked = state.enabledApps[state.apps[i].pkg] ?: false,
-                                onClick = { updateMediaAppEnabled(state.apps[i].pkg) }
+                                onClick = { updateMediaAppEnabled(state.apps[i].pkg) },
+                                activityType = state.appActivityTypes[state.apps[i].pkg] ?: selectedActivityType,
+                                onActivityTypeChange = { newType ->
+                                    updateMediaAppActivityType(state.apps[i].pkg, newType)
+                                }
                             )
                         } else {
                             Spacer(modifier = Modifier.height(0.dp))
@@ -281,6 +308,38 @@ fun MediaRPC(
                     }
                 }
             }
+        }
+        if (showActivityTypeDialog) {
+            AlertDialog(
+                onDismissRequest = { showActivityTypeDialog = false },
+                title = { Text(text = "Media Activity Type") },
+                text = {
+                    Column {
+                        listOf(
+                            2 to "Listening (Recommended for music)",
+                            3 to "Watching (Recommended for video)",
+                            0 to "Playing (Game)",
+                            1 to "Streaming",
+                            5 to "Competing"
+                        ).forEach { (typeVal, label) ->
+                            PreferenceSingleChoiceItem(
+                                text = label,
+                                selected = selectedActivityType == typeVal,
+                                onClick = {
+                                    selectedActivityType = typeVal
+                                    Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE] = typeVal
+                                    showActivityTypeDialog = false
+                                }
+                            )
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showActivityTypeDialog = false }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                }
+            )
         }
     }
 }

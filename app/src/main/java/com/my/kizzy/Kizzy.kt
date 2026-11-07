@@ -145,6 +145,7 @@ internal fun ComponentActivity.Kizzy(
                     hasUsageAccess = usageAccessStatus.value,
                     state = viewModel.state.collectAsState().value,
                     updateAppEnabled = viewModel::updateAppEnabled,
+                    updateAppActivityType = viewModel::setAppActivityType,
                 )
             }
             animatedComposable(Routes.CUSTOM_RPC) {
@@ -161,7 +162,8 @@ internal fun ComponentActivity.Kizzy(
                     onBackPressed = { navController.popBackStack() },
                     state = viewModel.state.collectAsState().value,
                     hasNotificationAccess = notificationListenerAccess.value,
-                    updateMediaAppEnabled = viewModel::updateMediaAppEnabled
+                    updateMediaAppEnabled = viewModel::updateMediaAppEnabled,
+                    updateMediaAppActivityType = viewModel::setAppActivityType,
                 )
             }
             animatedComposable(Routes.PROFILE) {

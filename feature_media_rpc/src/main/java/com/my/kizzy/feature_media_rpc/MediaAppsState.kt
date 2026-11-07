@@ -19,5 +19,6 @@ import com.my.kizzy.data.utils.AppsInfo
 data class MediaAppsState(
     val apps: List<AppsInfo> = emptyList(),
     val enabledApps: Map<String, Boolean> = emptyMap(),
+    val appActivityTypes: Map<String, Int> = emptyMap(),
     val isLoading: Boolean = true,
 )

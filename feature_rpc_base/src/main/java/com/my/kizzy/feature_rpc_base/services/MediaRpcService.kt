@@ -136,6 +136,7 @@ class MediaRpcService : Service() {
                 if (playingMedia.name.isBlank()) {
                     logger.d("MediaRPC", "Updating RPC with empty data, stopping RPC")
                     kizzyRPC.closeRPC()
+                    return
                 }
                 kizzyRPC.updateRPC(playingMedia, enableTimestamps)
             }
@@ -147,7 +148,7 @@ class MediaRpcService : Service() {
                 kizzyRPC.apply {
                     clearButtons()
                     setName(playingMedia.name)
-                    setType(playingMedia.type ?: 2)
+                    setType(playingMedia.type ?: Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2])
                     setDetails(playingMedia.details)
                     setState(playingMedia.state)
                     setStartTimestamps(if (enableTimestamps) playingMedia.time?.start else null)
