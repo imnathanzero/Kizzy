@@ -343,6 +343,19 @@ class KizzyRPC(
             )
         } else null
 
+        val rpcButtons = ArrayList<String>()
+        val rpcButtonUrls = ArrayList<String>()
+        if (!commonRpc.button1.isNullOrEmpty() && !commonRpc.button1Url.isNullOrEmpty()) {
+            rpcButtons.add(commonRpc.button1)
+            rpcButtonUrls.add(commonRpc.button1Url)
+        }
+        if (!commonRpc.button2.isNullOrEmpty() && !commonRpc.button2Url.isNullOrEmpty()) {
+            rpcButtons.add(commonRpc.button2)
+            rpcButtonUrls.add(commonRpc.button2Url)
+        }
+        val finalButtons = if (rpcButtons.isNotEmpty()) rpcButtons else buttons.takeIf { it.isNotEmpty() && buttonUrl.size >= it.size }
+        val finalButtonUrls = if (rpcButtonUrls.isNotEmpty()) rpcButtonUrls else buttonUrl.takeIf { it.isNotEmpty() && buttons.size >= it.size }
+
         discordWebSocket.sendActivity(
             Presence(
                 activities = listOf(
@@ -355,8 +368,8 @@ class KizzyRPC(
                         timestamps = time.takeIf { enableTimestamps == true },
                         assets = assets,
                         party = party.takeIf { isGame && party != null },
-                        buttons = buttons.takeIf { buttons.size > 0 },
-                        metadata = Metadata(buttonUrls = buttonUrl).takeIf { buttonUrl.size > 0 },
+                        buttons = finalButtons,
+                        metadata = finalButtonUrls?.let { Metadata(buttonUrls = it) },
                         applicationId = applicationIdNumber.takeIf { it.isNotEmpty() } ?: Constants.APPLICATION_ID
                     )
                 ),

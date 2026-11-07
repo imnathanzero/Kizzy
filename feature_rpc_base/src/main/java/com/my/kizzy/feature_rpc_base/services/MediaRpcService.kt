@@ -137,8 +137,6 @@ class MediaRpcService : Service() {
                 .build()
         )
 
-        val rpcButtonsString = Prefs[Prefs.RPC_BUTTONS_DATA, "{}"]
-        val rpcButtons = Json.decodeFromString<RpcButtons>(rpcButtonsString)
         when (kizzyRPC.isRpcRunning()) {
             true -> {
                 if (playingMedia.name.isBlank()) {
@@ -164,13 +162,13 @@ class MediaRpcService : Service() {
                     setStatus(Prefs[Prefs.CUSTOM_ACTIVITY_STATUS, "dnd"])
                     setLargeImage(playingMedia.largeImage, playingMedia.largeText)
                     setSmallImage(playingMedia.smallImage, playingMedia.smallText)
-                    if (Prefs[Prefs.USE_RPC_BUTTONS, false]) {
-                        with(rpcButtons) {
-                            setButton1(button1.takeIf { it.isNotEmpty() })
-                            setButton1URL(button1Url.takeIf { it.isNotEmpty() })
-                            setButton2(button2.takeIf { it.isNotEmpty() })
-                            setButton2URL(button2Url.takeIf { it.isNotEmpty() })
-                        }
+                    if (!playingMedia.button1.isNullOrEmpty() && !playingMedia.button1Url.isNullOrEmpty()) {
+                        setButton1(playingMedia.button1)
+                        setButton1URL(playingMedia.button1Url)
+                    }
+                    if (!playingMedia.button2.isNullOrEmpty() && !playingMedia.button2Url.isNullOrEmpty()) {
+                        setButton2(playingMedia.button2)
+                        setButton2URL(playingMedia.button2Url)
                     }
                     build()
                 }

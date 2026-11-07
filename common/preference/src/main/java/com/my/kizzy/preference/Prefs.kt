@@ -154,6 +154,7 @@ object Prefs {
     const val MEDIA_RPC_SHOW_PLAYBACK_STATE = "show_playback_state"
     const val MEDIA_RPC_SHOW_SONG_AS_TITLE = "show_song_as_title"
     const val MEDIA_RPC_ACTIVITY_TYPE = "media_rpc_activity_type"
+    const val MEDIA_RPC_ENABLE_MEDIA_BUTTON = "media_rpc_enable_media_button"
 
     //Rpc Setting Preferences
     const val USE_RPC_BUTTONS = "use_saved_rpc_buttons"

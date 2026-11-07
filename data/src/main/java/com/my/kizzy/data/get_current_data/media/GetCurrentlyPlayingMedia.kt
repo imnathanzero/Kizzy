@@ -23,8 +23,11 @@ import com.my.kizzy.data.rpc.CommonRpc
 import com.my.kizzy.data.rpc.Constants.APPLICATION_ID
 import com.my.kizzy.data.rpc.Timestamps
 import com.my.kizzy.data.rpc.RpcImage
+import com.my.kizzy.domain.model.rpc.RpcButtons
 import com.my.kizzy.preference.Prefs
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class GetCurrentPlayingMedia @Inject constructor(
@@ -121,6 +124,43 @@ class GetCurrentPlayingMedia @Inject constructor(
                 val mediaType = savedAppActivityTypes[mediaController.packageName]
                     ?: Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2]
 
+                val enableMediaButton = Prefs[Prefs.MEDIA_RPC_ENABLE_MEDIA_BUTTON, true]
+                val mediaButton = if (enableMediaButton) {
+                    MediaButtonResolver.resolve(
+                        packageName = mediaController.packageName,
+                        title = title,
+                        artist = author,
+                        metadata = metadata
+                    )
+                } else null
+
+                val useRpcButtons = Prefs[Prefs.USE_RPC_BUTTONS, false]
+                val rpcButtonsString = Prefs[Prefs.RPC_BUTTONS_DATA, "{}"]
+                val savedRpcButtons = if (useRpcButtons) {
+                    try {
+                        Json.decodeFromString<RpcButtons>(rpcButtonsString)
+                    } catch (_: Exception) {
+                        null
+                    }
+                } else null
+
+                val btn1: String?
+                val btn1Url: String?
+                val btn2: String?
+                val btn2Url: String?
+
+                if (mediaButton != null) {
+                    btn1 = mediaButton.first
+                    btn1Url = mediaButton.second
+                    btn2 = savedRpcButtons?.button1?.takeIf { it.isNotEmpty() }
+                    btn2Url = savedRpcButtons?.button1Url?.takeIf { it.isNotEmpty() }
+                } else {
+                    btn1 = savedRpcButtons?.button1?.takeIf { it.isNotEmpty() }
+                    btn1Url = savedRpcButtons?.button1Url?.takeIf { it.isNotEmpty() }
+                    btn2 = savedRpcButtons?.button2?.takeIf { it.isNotEmpty() }
+                    btn2Url = savedRpcButtons?.button2Url?.takeIf { it.isNotEmpty() }
+                }
+
                 return if (Prefs[Prefs.MEDIA_RPC_SHOW_SONG_AS_TITLE, false]) {
                     CommonRpc(
                         name = title,
@@ -132,7 +172,11 @@ class GetCurrentPlayingMedia @Inject constructor(
                         largeText = appName,
                         smallText = smallText,
                         packageName = "$title::${mediaController.packageName}",
-                        time = timestamps.takeIf { it != null }
+                        time = timestamps.takeIf { it != null },
+                        button1 = btn1,
+                        button1Url = btn1Url,
+                        button2 = btn2,
+                        button2Url = btn2Url
                     )
                 } else {
                     CommonRpc(
@@ -145,7 +189,11 @@ class GetCurrentPlayingMedia @Inject constructor(
                         largeText = album,
                         smallText = smallText,
                         packageName = "$title::${mediaController.packageName}",
-                        time = timestamps.takeIf { it != null }
+                        time = timestamps.takeIf { it != null },
+                        button1 = btn1,
+                        button1Url = btn1Url,
+                        button2 = btn2,
+                        button2Url = btn2Url
                     )
                 }
             }

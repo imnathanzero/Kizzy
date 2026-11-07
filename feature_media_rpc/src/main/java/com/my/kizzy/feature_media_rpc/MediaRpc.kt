@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.PauseCircle
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.SmartButton
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.Search
@@ -63,6 +64,7 @@ import com.my.kizzy.preference.Prefs
 import com.my.kizzy.preference.Prefs.MEDIA_RPC_ALBUM_NAME
 import com.my.kizzy.preference.Prefs.MEDIA_RPC_APP_ICON
 import com.my.kizzy.preference.Prefs.MEDIA_RPC_ARTIST_NAME
+import com.my.kizzy.preference.Prefs.MEDIA_RPC_ENABLE_MEDIA_BUTTON
 import com.my.kizzy.preference.Prefs.MEDIA_RPC_ENABLE_TIMESTAMPS
 import com.my.kizzy.preference.Prefs.MEDIA_RPC_HIDE_ON_PAUSE
 import com.my.kizzy.preference.Prefs.MEDIA_RPC_SHOW_PLAYBACK_STATE
@@ -97,6 +99,7 @@ fun MediaRPC(
     var hideOnPause by remember { mutableStateOf(Prefs[MEDIA_RPC_HIDE_ON_PAUSE, false]) }
     var isShowPlaybackState by remember { mutableStateOf(Prefs[MEDIA_RPC_SHOW_PLAYBACK_STATE, false]) }
     var showSongAsTitle by remember { mutableStateOf(Prefs[Prefs.MEDIA_RPC_SHOW_SONG_AS_TITLE, false]) }
+    var isMediaButtonEnabled by remember { mutableStateOf(Prefs[MEDIA_RPC_ENABLE_MEDIA_BUTTON, true]) }
     var selectedActivityType by remember {
         mutableStateOf(Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2])
     }
@@ -251,6 +254,17 @@ fun MediaRPC(
                     ) {
                         showSongAsTitle = !showSongAsTitle
                         Prefs[MEDIA_RPC_SHOW_SONG_AS_TITLE] = showSongAsTitle
+                    }
+                }
+                item {
+                    PreferenceSwitch(
+                        title = stringResource(id = R.string.enable_media_button),
+                        description = stringResource(id = R.string.enable_media_button_desc),
+                        icon = Icons.Default.SmartButton,
+                        isChecked = isMediaButtonEnabled,
+                    ) {
+                        isMediaButtonEnabled = !isMediaButtonEnabled
+                        Prefs[MEDIA_RPC_ENABLE_MEDIA_BUTTON] = isMediaButtonEnabled
                     }
                 }
                 item {
