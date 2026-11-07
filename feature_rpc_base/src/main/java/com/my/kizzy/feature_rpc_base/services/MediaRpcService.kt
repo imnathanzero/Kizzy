@@ -101,10 +101,14 @@ class MediaRpcService : Service() {
         }
 
         mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-        mediaSessionManager.addOnActiveSessionsChangedListener(::activeSessionsListener, ComponentName(this, NotificationListener::class.java))
-
-        // Register first media session
-        activeSessionsListener(mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java)), false)
+        try {
+            mediaSessionManager.addOnActiveSessionsChangedListener(::activeSessionsListener, ComponentName(this, NotificationListener::class.java))
+            // Register first media session
+            activeSessionsListener(mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java)), false)
+        } catch (e: SecurityException) {
+            logger.e("MediaRPC", "Missing notification listener permission: ${e.message}")
+            stopSelf()
+        }
     }
 
     suspend private fun updatePresence() {
@@ -235,7 +239,9 @@ class MediaRpcService : Service() {
     }
 
     override fun onDestroy() {
-        mediaSessionManager.removeOnActiveSessionsChangedListener(::activeSessionsListener)
+        try {
+            mediaSessionManager.removeOnActiveSessionsChangedListener(::activeSessionsListener)
+        } catch (_: Exception) {}
         currentMediaController?.unregisterCallback(mediaControllerCallback)
         scope.cancel()
         kizzyRPC.closeRPC()

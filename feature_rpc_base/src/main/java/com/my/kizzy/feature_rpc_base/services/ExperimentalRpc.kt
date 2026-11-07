@@ -137,10 +137,18 @@ class ExperimentalRpc : Service() {
 
 
             mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-            mediaSessionManager.addOnActiveSessionsChangedListener(
-                ::activeSessionsListener,
-                ComponentName(this, NotificationListener::class.java)
-            )
+            var initialMediaSessions: List<MediaController> = emptyList()
+            try {
+                mediaSessionManager.addOnActiveSessionsChangedListener(
+                    ::activeSessionsListener,
+                    ComponentName(this, NotificationListener::class.java)
+                )
+                initialMediaSessions = mediaSessionManager.getActiveSessions(
+                    ComponentName(this, NotificationListener::class.java)
+                )
+            } catch (e: SecurityException) {
+                logger.e(TAG, "Notification listener access missing: ${e.message}")
+            }
 
             // Always reload settings on start
             templateName = Prefs[Prefs.EXPERIMENTAL_RPC_TEMPLATE_NAME, TemplateKeys.APP_NAME]
@@ -154,10 +162,6 @@ class ExperimentalRpc : Service() {
             } catch (_: Exception) {
                 emptyList()
             }
-
-            val initialMediaSessions = mediaSessionManager.getActiveSessions(
-                ComponentName(this, NotificationListener::class.java)
-            )
             var mediaActiveInitially = false
             if (useMediaRpc && initialMediaSessions.isNotEmpty()) {
                 val firstActiveMediaController = initialMediaSessions.firstOrNull {
@@ -500,7 +504,9 @@ class ExperimentalRpc : Service() {
     }
 
     override fun onDestroy() {
-        mediaSessionManager.removeOnActiveSessionsChangedListener(::activeSessionsListener)
+        try {
+            mediaSessionManager.removeOnActiveSessionsChangedListener(::activeSessionsListener)
+        } catch (_: Exception) {}
         currentMediaController?.unregisterCallback(mediaControllerCallback)
         scope.cancel()
         kizzyRPC.closeRPC()
