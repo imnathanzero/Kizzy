@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import com.my.kizzy.feature_rpc_base.AppUtils
 import com.my.kizzy.feature_rpc_base.services.AppDetectionService
 import com.my.kizzy.feature_rpc_base.services.CustomRpcService
-import com.my.kizzy.feature_rpc_base.services.ExperimentalRpc
 import com.my.kizzy.feature_rpc_base.services.MediaRpcService
 import com.my.kizzy.resources.R
 import com.my.kizzy.ui.components.AppsItem
@@ -159,7 +158,6 @@ fun AppsRPC(
                                 true -> {
                                     ctx.stopService(Intent(ctx, MediaRpcService::class.java))
                                     ctx.stopService(Intent(ctx, CustomRpcService::class.java))
-                                    ctx.stopService(Intent(ctx, ExperimentalRpc::class.java))
                                     ctx.startService(Intent(ctx, AppDetectionService::class.java))
                                 }
 

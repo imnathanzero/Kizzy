@@ -31,8 +31,7 @@ class DialogActivity : Activity() {
     private fun showDialog() {
         val rpc = arrayOf(
             getString(R.string.main_appDetection),
-            getString(R.string.main_mediaRpc),
-            getString(R.string.main_experimentalRpc)
+            getString(R.string.main_mediaRpc)
         )
         val dialog = MaterialAlertDialogBuilder(ContextThemeWrapper(this, com.my.kizzy.feature_rpc_base.R.style.MyTileDialogTheme))
             .setTitle(getString(R.string.choose_rpc))
@@ -40,7 +39,6 @@ class DialogActivity : Activity() {
                 when (which) {
                     0 -> startService(Intent(this, AppDetectionService::class.java))
                     1 -> startService(Intent(this, MediaRpcService::class.java))
-                    2 -> startService(Intent(this, ExperimentalRpc::class.java))
                 }
                 dialog.dismiss()
                 finish()

@@ -143,7 +143,6 @@ object Prefs {
     const val LANGUAGE = "language"
     const val ENABLED_APPS = "enabled_apps"
     const val ENABLED_MEDIA_APPS = "enabled_media_apps"
-    const val ENABLED_EXPERIMENTAL_APPS = "enabled_experimental_apps"
 
     //Media Rpc Preferences
     const val MEDIA_RPC_ARTIST_NAME = "media_rpc_artist_name"
@@ -232,52 +231,24 @@ object Prefs {
         "org.videolan.vlc",
     )
 
-    //Experimental RPC Preferences
-    const val EXPERIMENTAL_RPC_USE_APPS_RPC = "experimental_rpc_use_apps"
-    const val EXPERIMENTAL_RPC_USE_MEDIA_RPC = "experimental_rpc_use_media"
-    const val EXPERIMENTAL_RPC_TEMPLATE_NAME = "experimental_rpc_template_name"
-    const val EXPERIMENTAL_RPC_TEMPLATE_DETAILS = "experimental_rpc_template_details"
-    const val EXPERIMENTAL_RPC_TEMPLATE_STATE = "experimental_rpc_template_state"
-    const val EXPERIMENTAL_RPC_APP_ACTIVITY_TYPES = "experimental_rpc_app_activity_types"
-    const val EXPERIMENTAL_RPC_SHOW_COVER_ART = "experimental_rpc_show_cover_art"
-    const val EXPERIMENTAL_RPC_SHOW_APP_ICON = "experimental_rpc_show_app_icon"
-    const val EXPERIMENTAL_RPC_SHOW_PLAYBACK_STATE = "experimental_rpc_show_playback_state"
-    const val EXPERIMENTAL_RPC_ENABLE_TIMESTAMPS = "experimental_rpc_enable_timestamps"
-    const val EXPERIMENTAL_RPC_HIDE_ON_PAUSE = "experimental_rpc_hide_on_pause"
+    const val APP_ACTIVITY_TYPES = "app_activity_types"
     fun saveAppActivityType(packageName: String, activityType: Int) {
-        val json = get(EXPERIMENTAL_RPC_APP_ACTIVITY_TYPES, "{}")
+        val json = get(APP_ACTIVITY_TYPES, "{}")
         val map: MutableMap<String, Int> = try {
             Json.decodeFromString(json)
         } catch (_: Exception) {
             mutableMapOf()
         }
         map[packageName] = activityType
-        set(EXPERIMENTAL_RPC_APP_ACTIVITY_TYPES, Json.encodeToString(map))
+        set(APP_ACTIVITY_TYPES, Json.encodeToString(map))
     }
 
     fun getAppActivityTypes(): Map<String, Int> {
-        val json = get(EXPERIMENTAL_RPC_APP_ACTIVITY_TYPES, "{}")
+        val json = get(APP_ACTIVITY_TYPES, "{}")
         return try {
             Json.decodeFromString(json)
         } catch (_: Exception) {
             emptyMap()
         }
-    }
-
-    fun isExperimentalAppEnabled(packageName: String?): Boolean {
-        val apps = get(ENABLED_EXPERIMENTAL_APPS, "[]")
-        val enabledPackages: ArrayList<String> = Json.decodeFromString(apps)
-        return enabledPackages.contains(packageName)
-    }
-
-    fun saveExperimentalAppToPrefs(pkg: String) {
-        val apps = get(ENABLED_EXPERIMENTAL_APPS, "[]")
-        val enabledPackages: ArrayList<String> = Json.decodeFromString(apps)
-        if (enabledPackages.contains(pkg))
-            enabledPackages.remove(pkg)
-        else
-            enabledPackages.add(pkg)
-
-        set(ENABLED_EXPERIMENTAL_APPS, Json.encodeToString(enabledPackages))
     }
 }

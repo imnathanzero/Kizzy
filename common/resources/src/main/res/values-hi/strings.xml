@@ -96,7 +96,7 @@
     <string name="update">अपडेट करें</string>
     <string name="configs_directory">config रखने की लोकेशन</string>
     <string name="custom_activity_type">कस्टम काम का टाइप</string>
-    <string name="custom_activity_type_desc">यह डिफॉल्ट काम के टाइप को हटा देता है। सिर्फ मीडिया और experimental RPC में काम करता है।</string>
+    <string name="custom_activity_type_desc">यह डिफॉल्ट काम के टाइप को हटा देता है। सिर्फ मीडिया में काम करता है।</string>
     <string name="custom_activity_status">कस्टम काम के हालात</string>
     <string name="custom_activity_status_desc">यह डिफॉल्ट काम का स्टेटस को हटा देता है।</string>
     <string name="search">खोज करें</string>
@@ -111,8 +111,6 @@
     <string name="main_customRpc">कस्टम RPC</string>
     <string name="main_consoleRpc">कंसोल RPC</string>
     <string name="main_consoleRpc_details">किज़ी आपको पहले से बने कुछ प्रीसेट्स का इस्तेमाल करके Discord पर अपनी स्थिति सेट करने देता है।</string>
-    <string name="main_experimentalRpc">एक्सपेरिमेंटल RPC</string>
-    <string name="main_experimentalRpc_details">एक्सपेरिमेंटल RPC किज़ी का एक फीचर है जो लगातार ऐप्स RPC और मीडिया RPC के बीच बदलता रहता है।</string>
     <string name="main_customRpc_details">किज़ी आपको खुद का पूरा कस्टम RPC बनाने देता है।</string>
     <string name="main_comingSoon">जल्द आ रहा है</string>
     <string name="exit">बाहर जाएं</string>
@@ -190,12 +188,10 @@
     <string name="use_imgur_desc">Imgur को इमेज प्रॉक्सी के रूप मे इस्तेमाल करे</string>
     <string name="start_appDetection">ऐप डिटेक्ट करना शुरू करे</string>
     <string name="start_mediaRPC">मीडिया RPC शुरू करे</string>
-    <string name="start_experimentalRPC">Experimental RPC शुरू करे</string>
     <string name="stop_rpc">RPC बंद करे</string>
     <string name="stop">बंद करे</string>
     <string name="start_appDetection_toast">ऐप डिटेक्ट होना शुरू हो गया है</string>
     <string name="start_mediaRPC_toast">मीडिया RPC शुरू हो गया है</string>
-    <string name="start_experimentalRPC_toast">Experimental RPC शुरू हो गया है</string>
     <string name="stop_rpc_toast">सभी सर्विस बंद हो गई है</string>
     <string name="show_playback_state">प्लेबैक का हाल दिखाए</string>
     <string name="copied_to_clipboard">क्लिपबोर्ड मे कॉपी हो गया है</string>
@@ -204,16 +200,12 @@
     <string name="custom_application_id_desc">डिफॉल्ट Discord एप्लीकेशन आईडी को बदल देता है</string>
     <string name="use_a_vpn_desc">हो सकता है Discord लॉगिन आपके देश में बिना VPN/DPI के काम ना करें। कृपया VPN/DPI का उपयोग करें।</string>
     <string name="rpc_templates_note">आप {{app_name}}, {{media_title}} जैसे प्लेसहोल्डर का उपयोग कर सकते है। खाली छोड़ने पर डिफॉल्ट उपयोग होगा या छोड़ दिया जाएगा</string>
-    <string name="experimental_rpc_detect_apps">Experimental RPC को ऐप डिटेक्ट करने की इजाज़त दे</string>
-    <string name="experimental_rpc_detect_media">Experimental RPC को मीडिया डिटेक्ट करने की इजाज़त दे</string>
     <string name="app_preferences">आपकी ऐप की पसंद</string>
-    <string name="app_preferences_desc">Experimental RPC के लिए कौनसे ऐप चालू है, चुनें</string>
     <string name="completion_media_title">गाना/वीडियो का नाम</string>
     <string name="completion_media_artist">मुख्य संगीतकार</string>
     <string name="completion_app_name">ऐप का नाम पता चल गया</string>
     <string name="show_cover_art">कवर फोटो दिखाए</string>
     <string name="show_cover_art_desc">एल्बम का कवर फोटो बड़ा करे</string>
-    <string name="enable_experimental_rpc">Experimental RPC चालू करें</string>
     <string name="completion_media_author">मुख्य संगीतकार</string>
     <string name="imgur_client_id">Imgur Client ID</string>
     <string name="set_imgur_client_id">Imgur Client ID सेट करे</string>

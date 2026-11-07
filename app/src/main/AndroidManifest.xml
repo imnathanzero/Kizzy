@@ -114,10 +114,6 @@
                 android:value="true" />
         </service>
 
-        <service android:name=".feature_rpc_base.services.ExperimentalRpc"
-            android:foregroundServiceType="mediaPlayback"
-            android:exported="false"/>
-
         <service
             android:name=".feature_rpc_base.services.KizzyTileService"
             android:icon="@drawable/ic_tile_play"

@@ -39,8 +39,6 @@ include(
     ":feature_console_rpc",
     ":feature_custom_rpc",
     ":feature_home",
-    ":common:navigation",
-    ":feature_experimental_rpc"
-
+    ":common:navigation"
 )
 rootProject.name = "Kizzy"

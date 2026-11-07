@@ -74,7 +74,6 @@ import com.my.kizzy.feature_custom_rpc.components.sheet.dataToString
 import com.my.kizzy.feature_rpc_base.AppUtils
 import com.my.kizzy.feature_rpc_base.services.AppDetectionService
 import com.my.kizzy.feature_rpc_base.services.CustomRpcService
-import com.my.kizzy.feature_rpc_base.services.ExperimentalRpc
 import com.my.kizzy.feature_rpc_base.services.MediaRpcService
 import com.my.kizzy.preference.Prefs
 import com.my.kizzy.resources.R
@@ -233,7 +232,6 @@ private fun RpcTextFieldsColumn(
                     true -> {
                         context.stopService(Intent(context, AppDetectionService::class.java))
                         context.stopService(Intent(context, MediaRpcService::class.java))
-                        context.stopService(Intent(context, ExperimentalRpc::class.java))
                         val intent = Intent(context, CustomRpcService::class.java)
                         val string = uiState.rpcConfig.dataToString()
                         intent.putExtra("RPC", string)

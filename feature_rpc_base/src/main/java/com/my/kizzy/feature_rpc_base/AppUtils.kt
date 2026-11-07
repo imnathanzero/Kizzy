@@ -18,7 +18,6 @@ import android.app.ActivityManager
 import android.content.Context
 import com.my.kizzy.feature_rpc_base.services.AppDetectionService
 import com.my.kizzy.feature_rpc_base.services.CustomRpcService
-import com.my.kizzy.feature_rpc_base.services.ExperimentalRpc
 import com.my.kizzy.feature_rpc_base.services.MediaRpcService
 import javax.inject.Singleton
 
@@ -38,10 +37,6 @@ object AppUtils {
 
     fun customRpcRunning(): Boolean {
         return checkForRunningService<CustomRpcService>()
-    }
-
-    fun experimentalRpcRunning(): Boolean {
-        return checkForRunningService<ExperimentalRpc>()
     }
     private inline fun <reified T : Any> checkForRunningService(): Boolean {
         for (runningServiceInfo in activityManager.getRunningServices(

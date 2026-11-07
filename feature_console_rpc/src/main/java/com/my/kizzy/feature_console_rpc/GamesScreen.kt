@@ -62,7 +62,6 @@ import com.my.kizzy.domain.model.Game
 import com.my.kizzy.domain.model.rpc.RpcConfig
 import com.my.kizzy.feature_rpc_base.services.AppDetectionService
 import com.my.kizzy.feature_rpc_base.services.CustomRpcService
-import com.my.kizzy.feature_rpc_base.services.ExperimentalRpc
 import com.my.kizzy.feature_rpc_base.services.MediaRpcService
 import com.my.kizzy.preference.Prefs
 import com.my.kizzy.resources.R
@@ -227,12 +226,6 @@ fun GamesScreen(
                                             Intent(
                                                 context,
                                                 MediaRpcService::class.java
-                                            )
-                                        )
-                                        context.stopService(
-                                            Intent(
-                                                context,
-                                                ExperimentalRpc::class.java
                                             )
                                         )
                                         context.startService(intent)

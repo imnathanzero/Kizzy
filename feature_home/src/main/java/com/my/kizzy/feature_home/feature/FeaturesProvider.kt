@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.my.kizzy.feature_rpc_base.AppUtils
 import com.my.kizzy.feature_rpc_base.services.AppDetectionService
 import com.my.kizzy.feature_rpc_base.services.CustomRpcService
-import com.my.kizzy.feature_rpc_base.services.ExperimentalRpc
 import com.my.kizzy.feature_rpc_base.services.MediaRpcService
 import com.my.kizzy.navigation.Routes
 import com.my.kizzy.preference.Prefs
@@ -49,7 +48,6 @@ fun homeFeaturesProvider(
             onCheckedChange = {
                 if (it) {
                     ctx.stopService(Intent(ctx, CustomRpcService::class.java))
-                    ctx.stopService(Intent(ctx, ExperimentalRpc::class.java))
                     ctx.stopService(Intent(ctx, MediaRpcService::class.java))
                     ctx.startService(Intent(ctx, AppDetectionService::class.java))
                 } else
@@ -70,7 +68,6 @@ fun homeFeaturesProvider(
             onCheckedChange = {
                 if (it) {
                     ctx.stopService(Intent(ctx, CustomRpcService::class.java))
-                    ctx.stopService(Intent(ctx, ExperimentalRpc::class.java))
                     ctx.stopService(Intent(ctx, AppDetectionService::class.java))
                     ctx.startService(Intent(ctx, MediaRpcService::class.java))
                 } else
@@ -95,7 +92,6 @@ fun homeFeaturesProvider(
                         putExtra("RPC", lastRpc)
                     }
                     ctx.stopService(Intent(ctx, MediaRpcService::class.java))
-                    ctx.stopService(Intent(ctx, ExperimentalRpc::class.java))
                     ctx.stopService(Intent(ctx, AppDetectionService::class.java))
                     ctx.startService(intent)
                 } else
@@ -121,7 +117,6 @@ fun homeFeaturesProvider(
                         putExtra("RPC", lastRpc)
                     }
                     ctx.stopService(Intent(ctx, MediaRpcService::class.java))
-                    ctx.stopService(Intent(ctx, ExperimentalRpc::class.java))
                     ctx.stopService(Intent(ctx, AppDetectionService::class.java))
                     ctx.startService(intent)
                 } else

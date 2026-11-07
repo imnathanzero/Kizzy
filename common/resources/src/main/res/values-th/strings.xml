@@ -95,7 +95,7 @@
     <string name="update">อัปเดต</string>
     <string name="configs_directory">ตั้งค่าไดเรกทอรี</string>
     <string name="custom_activity_type">ตั้งค่าประเภทกิจกรรม</string>
-    <string name="custom_activity_type_desc">การเขียนทับประเภทดั้งเดิมของกิจกรรม จะใช้ได้เฉพาะแค่ media หรือ experimental rpc เท่านั้น!</string>
+    <string name="custom_activity_type_desc">การเขียนทับประเภทดั้งเดิมของกิจกรรม จะใช้ได้เฉพาะแค่ media เท่านั้น!</string>
     <string name="custom_activity_status">ตั้งค่าสถานะของกิจกรรม</string>
     <string name="custom_activity_status_desc">เขียนทับสถานะดั้งเดิมของกิจกรรม</string>
     <string name="search">ค้นหา</string>
@@ -110,8 +110,6 @@
     <string name="main_customRpc">Custom RPC</string>
     <string name="main_consoleRpc">Console RPC</string>
     <string name="main_consoleRpc_details">Kizzy อนุญาตให้คุณใช้พรีเซ็ตที่กำหนดไว้ล่วงหน้าเพื่อกำหนดสถานะของคุณบน Discord ได้</string>
-    <string name="main_experimentalRpc">Experimental RPC</string>
-    <string name="main_experimentalRpc_details">Experimental RPC เป็นฟีเจอร์ในแอป Kizzy มีการสลับการใช้ฟีเจอร์ระหว่าง Apps RPC และ Media RPC อย่างเรียบเนียบ</string>
     <string name="main_customRpc_details">Kizzy ยอมให้คุณสร้างสถานะกิจกรรมของdiscord ตามใจชอบแบบเต็มพิกัดได้เลย!</string>
     <string name="main_comingSoon">อดใจไว้ก่อน ฟีเจอร์ใหม่ยังไม่มา</string>
     <string name="exit">ออก</string>
@@ -189,12 +187,10 @@
     <string name="use_imgur_desc">จะใช้ Imgur เป็นพร็อกซี่ของภาพที่จะใช้แทน</string>
     <string name="start_appDetection">เริ่มการใช้ App Detection แล้ว</string>
     <string name="start_mediaRPC">เริ่มการใช้ Media RPC แล้ว</string>
-    <string name="start_experimentalRPC">เริ่มการใช้ Experimental RPC แล้ว</string>
     <string name="stop_rpc">หยุดการใช้ RPC แล้ว</string>
     <string name="stop">หยุด</string>
     <string name="start_appDetection_toast">App Detection เริ่มใช้งานไปแล้ว</string>
     <string name="start_mediaRPC_toast">Media RPC เริ่มใช้งานไปแล้ว</string>
-    <string name="start_experimentalRPC_toast">Experimental RPC เริ่มใช้งานไปแล้ว</string>
     <string name="stop_rpc_toast">services ทั้งหมดหยุดการทำงานแล้ว</string>
     <string name="show_playback_state">แสดงสถานะการเล่น</string>
     <string name="copied_to_clipboard">ก็อปไปยังคลิปบอร์ดแล้ว</string>
@@ -203,16 +199,12 @@
     <string name="custom_application_id_desc">เขียนทับไอดีแอปพลิเคชั่นดั้งเดิมของ Discord</string>
     <string name="use_a_vpn_desc">การล็อกอินผ่าน Discord อาจจะใช้งานไม่ได้หากไม่ได้ใช้ร่วมกับ VPN/DPI โปรดใช้ VPN/DPI เพื่อใช้งานต่อ</string>
     <string name="rpc_templates_note">ใช้ข้อความตัวอย่าง เช่น {{app_name}}, {{media_title}}, {{media_artist}} ฯลฯ หากเว้นว่างไว้ ระบบจะใช้เป็นค่าเริ่มต้นหรือข้ามไป</string>
-    <string name="experimental_rpc_detect_apps">อนุญาตให้ Experimental RPC ตรวจจับแอปที่กำลังทำงานอยู่</string>
-    <string name="experimental_rpc_detect_media">อนุญาตให้ Experimental RPC ตรวจจับสื่อที่กำลังเล่นอยู่</string>
     <string name="app_preferences">การตั้งค่าแอป</string>
-    <string name="app_preferences_desc">เลือกแอปที่จะเปิดใช้งาน Experimental RPC</string>
     <string name="completion_media_title">ชื่อเพลง/วิดีโอ</string>
     <string name="completion_media_artist">ศิลปินหลัก</string>
     <string name="completion_app_name">ชื่อแอปที่ตรวจพบ</string>
     <string name="show_cover_art">แสดงภาพปกอัลบั้ม</string>
     <string name="show_cover_art_desc">แสดงภาพปกอัลบั้มเป็นภาพขนาดใหญ่</string>
-    <string name="enable_experimental_rpc">เปิดใช้งาน Experimental RPC</string>
     <string name="completion_media_author">ผู้แต่งหลัก</string>
     <string name="imgur_client_id">Imgur Client ID</string>
     <string name="set_imgur_client_id">ตั้งค่า Imgur Client ID</string>

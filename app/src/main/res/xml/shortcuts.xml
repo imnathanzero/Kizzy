@@ -38,18 +38,6 @@
 
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/shortcuts_dev_rpc"
-        android:shortcutId="experimentalRPC"
-        android:shortcutLongLabel="@string/main_experimentalRpc"
-        android:shortcutShortLabel="@string/start_experimentalRPC">
-        <intent
-            android:action="com.my.kizzy.intent.action.START_EXPERIMENTAL_RPC"
-            android:targetClass="com.my.kizzy.feature_rpc_base.services.ShortcutsActivity"
-            android:targetPackage="com.my.kizzy" />
-    </shortcut>
-
-    <shortcut
-        android:enabled="true"
         android:icon="@drawable/shortcuts_stop"
         android:shortcutId="stopRPC"
         android:shortcutLongLabel="@string/stop"

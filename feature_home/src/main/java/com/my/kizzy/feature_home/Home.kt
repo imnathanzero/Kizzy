@@ -357,12 +357,6 @@ val fakeFeatures = listOf(
         icon = R.drawable.ic_console_games,
         shape = RoundedCornerShape(20.dp, 44.dp, 20.dp, 44.dp),
         tooltipText = ToolTipContent.CONSOLE_RPC_DOCS
-    ),
-    HomeFeature(
-        title = "Experimental RPC",
-        icon = R.drawable.ic_dev_rpc,
-        shape = RoundedCornerShape(20.dp, 44.dp, 20.dp, 44.dp),
-        tooltipText = ToolTipContent.EXPERIMENTAL_RPC_DOCS
     )
 )
 
