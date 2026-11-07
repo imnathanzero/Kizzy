@@ -131,12 +131,6 @@ fun homeFeaturesProvider(
             showSwitch = Prefs[Prefs.LAST_RUN_CONSOLE_RPC, ""].isNotEmpty(),
             tooltipText = stringResource(id = R.string.main_consoleRpc_details),
             featureDocsLink = ToolTipContent.CONSOLE_RPC_DOCS_LINK
-        ),
-        HomeFeature(
-            title = stringResource(id = R.string.main_comingSoon),
-            icon = R.drawable.ic_info,
-            shape = RoundedCornerShape(20.dp, 44.dp, 20.dp, 44.dp),
-            showSwitch = false
         )
     )
 }

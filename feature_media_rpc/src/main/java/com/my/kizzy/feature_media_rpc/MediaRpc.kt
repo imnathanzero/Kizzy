@@ -100,10 +100,6 @@ fun MediaRPC(
     var isShowPlaybackState by remember { mutableStateOf(Prefs[MEDIA_RPC_SHOW_PLAYBACK_STATE, false]) }
     var showSongAsTitle by remember { mutableStateOf(Prefs[Prefs.MEDIA_RPC_SHOW_SONG_AS_TITLE, false]) }
     var isMediaButtonEnabled by remember { mutableStateOf(Prefs[MEDIA_RPC_ENABLE_MEDIA_BUTTON, true]) }
-    var selectedActivityType by remember {
-        mutableStateOf(Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE, 2])
-    }
-    var showActivityTypeDialog by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         rememberTopAppBarState(),
@@ -268,21 +264,6 @@ fun MediaRPC(
                     }
                 }
                 item {
-                    val activityTypeLabel = when (selectedActivityType) {
-                        0 -> "Playing"
-                        1 -> "Streaming"
-                        2 -> "Listening (Default)"
-                        3 -> "Watching"
-                        5 -> "Competing"
-                        else -> "Listening"
-                    }
-                    PreferenceSingleChoiceItem(
-                        text = "Default Activity: $activityTypeLabel",
-                        selected = true,
-                        onClick = { showActivityTypeDialog = true }
-                    )
-                }
-                item {
                     Subtitle(
                         text = "Apps",
                         modifier = Modifier
@@ -311,7 +292,7 @@ fun MediaRPC(
                                 pkg = state.apps[i].pkg,
                                 isChecked = state.enabledApps[state.apps[i].pkg] ?: false,
                                 onClick = { updateMediaAppEnabled(state.apps[i].pkg) },
-                                activityType = state.appActivityTypes[state.apps[i].pkg] ?: selectedActivityType,
+                                activityType = state.appActivityTypes[state.apps[i].pkg] ?: 2,
                                 onActivityTypeChange = { newType ->
                                     updateMediaAppActivityType(state.apps[i].pkg, newType)
                                 }
@@ -322,38 +303,6 @@ fun MediaRPC(
                     }
                 }
             }
-        }
-        if (showActivityTypeDialog) {
-            AlertDialog(
-                onDismissRequest = { showActivityTypeDialog = false },
-                title = { Text(text = "Media Activity Type") },
-                text = {
-                    Column {
-                        listOf(
-                            2 to "Listening (Recommended for music)",
-                            3 to "Watching (Recommended for video)",
-                            0 to "Playing (Game)",
-                            1 to "Streaming",
-                            5 to "Competing"
-                        ).forEach { (typeVal, label) ->
-                            PreferenceSingleChoiceItem(
-                                text = label,
-                                selected = selectedActivityType == typeVal,
-                                onClick = {
-                                    selectedActivityType = typeVal
-                                    Prefs[Prefs.MEDIA_RPC_ACTIVITY_TYPE] = typeVal
-                                    showActivityTypeDialog = false
-                                }
-                            )
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showActivityTypeDialog = false }) {
-                        Text(text = stringResource(R.string.cancel))
-                    }
-                }
-            )
         }
     }
 }
