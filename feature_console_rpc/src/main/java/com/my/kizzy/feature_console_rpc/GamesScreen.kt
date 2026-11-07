@@ -216,7 +216,7 @@ fun GamesScreen(
                                             Json.encodeToString(
                                                 config.copy(
                                                     name = gameTitle,
-                                                    details = "Playing",
+                                                    details = "",
                                                     smallImg = selectedPlatform.smallIcon ?: "",
                                                     smallText = selectedPlatform.smallText ?: "",
                                                     platform = ""

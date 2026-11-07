@@ -45,7 +45,7 @@ enum class GamePlatform(
 fun buildGameRpcConfig(game: Game, platform: GamePlatform): RpcConfig {
     return RpcConfig(
         name = game.game_title,
-        details = "Playing",
+        details = "",
         timestampsStart = System.currentTimeMillis().toString(),
         status = "dnd",
         largeImg = game.large_image ?: "",
