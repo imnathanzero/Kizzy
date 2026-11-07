@@ -228,6 +228,7 @@ open class DiscordWebSocketImpl(
                     d = d,
                 )
             )
+            logger.d("Gateway", "Outgoing: $payload")
             websocket?.send(Frame.Text(payload))
         }
     }

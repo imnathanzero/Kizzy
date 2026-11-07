@@ -122,10 +122,6 @@ fun String.toRpcImage(): RpcImage? {
         null
     else if (this.startsWith("attachments") || this.startsWith("external"))
         RpcImage.DiscordImage(this)
-    else if (this.startsWith("https://media.discordapp.net/attachments/") || this.startsWith("https://cdn.discordapp.com/attachments/"))
-        RpcImage.DiscordImage(this.substringAfter("attachments/").let { "attachments/$it" })
-    else if (this.startsWith("https://media.discordapp.net/external/") || this.startsWith("https://cdn.discordapp.com/external/"))
-        RpcImage.DiscordImage(this.substringAfter("external/").let { "external/$it" })
     else if (this.startsWith("mp:"))
         RpcImage.DiscordImage(this.removePrefix("mp:"))
     else

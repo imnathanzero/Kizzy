@@ -316,7 +316,7 @@ class KizzyRPC(
                 )
             ),
             afk = true,
-            since = if (status == "idle") (startTimestamps ?: System.currentTimeMillis()) else null,
+            since = if (status == "idle") (startTimestamps ?: System.currentTimeMillis()) else 0L,
             status = status
         )
         connectToWebSocket()
@@ -392,7 +392,7 @@ class KizzyRPC(
                     )
                 ),
                 afk = true,
-                since = if (this.status == "idle") (startTimestamps ?: System.currentTimeMillis()) else null,
+                since = if (this.status == "idle") (startTimestamps ?: System.currentTimeMillis()) else 0L,
                 status = this.status
             )
         )
