@@ -35,6 +35,7 @@ open class DiscordWebSocketImpl(
     private var resumeGatewayUrl: String? = null
     private var heartbeatJob: Job? = null
     private var connected = false
+    private var readyDeferred = CompletableDeferred<Unit>()
     private var client: HttpClient = HttpClient {
         install(WebSockets)
     }
@@ -47,6 +48,9 @@ open class DiscordWebSocketImpl(
         get() = SupervisorJob() + Dispatchers.Default
 
     override suspend fun connect() {
+        if (readyDeferred.isCompleted) {
+            readyDeferred = CompletableDeferred()
+        }
         launch {
             try {
                 logger.i("Gateway","Connect called")
@@ -112,10 +116,17 @@ open class DiscordWebSocketImpl(
                 logger.i("Gateway","resume_gateway_url updated to $resumeGatewayUrl")
                 logger.i("Gateway","session_id updated to $sessionId")
                 connected = true
+                if (!readyDeferred.isCompleted) {
+                    readyDeferred.complete(Unit)
+                }
                 return
             }
             "RESUMED" -> {
                 logger.i("Gateway","Session Resumed")
+                connected = true
+                if (!readyDeferred.isCompleted) {
+                    readyDeferred.complete(Unit)
+                }
             }
             else -> {}
         }
@@ -222,6 +233,9 @@ open class DiscordWebSocketImpl(
         resumeGatewayUrl = null
         sessionId = null
         connected = false
+        if (!readyDeferred.isCompleted) {
+            readyDeferred.cancel()
+        }
         runBlocking {
             websocket?.close()
             logger.e("Gateway","Connection to gateway closed")
@@ -229,9 +243,12 @@ open class DiscordWebSocketImpl(
     }
 
     override suspend fun sendActivity(presence: Presence) {
-        // TODO : Figure out a better way to wait for socket to be connected to account
-        while (!isSocketConnectedToAccount()){
-            delay(10.milliseconds)
+        if (!isSocketConnectedToAccount()) {
+            try {
+                readyDeferred.await()
+            } catch (_: CancellationException) {
+                return
+            }
         }
         logger.i("Gateway","Sending $PRESENCE_UPDATE")
         send(
