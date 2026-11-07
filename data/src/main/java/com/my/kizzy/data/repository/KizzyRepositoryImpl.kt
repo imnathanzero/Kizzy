@@ -37,20 +37,24 @@ class KizzyRepositoryImpl @Inject constructor(
 ) : KizzyRepository {
 
     override suspend fun getImage(url: String): String? {
-        return if (Prefs[Prefs.USE_IMGUR, false]) {
-            imgurApi.getImage(url, Prefs[Prefs.TOKEN]).getOrNull()?.toExternalAsset()
-        } else {
-            api.getImage(url).getOrNull()?.toAttachmentAsset()
+        if (Prefs[Prefs.USE_IMGUR, false]) {
+            return imgurApi.getImage(url, Prefs[Prefs.TOKEN]).getOrNull()?.toExternalAsset()
         }
+        val asset = api.getImage(url).getOrNull()?.toAttachmentAsset()
+        return asset ?: imgurApi.getImage(url, Prefs[Prefs.TOKEN]).getOrNull()?.toExternalAsset()
     }
 
     override suspend fun uploadImage(file: File): String? {
-        return if (Prefs[Prefs.USE_IMGUR, false]) {
-            imgurApi.uploadImage(file, Prefs[Prefs.IMGUR_CLIENT_ID, Constants.IMGUR_CLIENT_ID])
-                .getOrNull()?.toImageURL()?.let { this.getImage(it) }
-        } else {
-            api.uploadImage(file).getOrNull()?.toAttachmentAsset()
+        if (Prefs[Prefs.USE_IMGUR, false]) {
+            return uploadViaImgur(file)
         }
+        val result = api.uploadImage(file).getOrNull()?.toAttachmentAsset()
+        return result ?: uploadViaImgur(file)
+    }
+
+    private suspend fun uploadViaImgur(file: File): String? {
+        return imgurApi.uploadImage(file, Prefs[Prefs.IMGUR_CLIENT_ID, Constants.IMGUR_CLIENT_ID])
+            .getOrNull()?.toImageURL()?.let { this.getImage(it) }
     }
 
     override suspend fun getGames(): List<Game> {
