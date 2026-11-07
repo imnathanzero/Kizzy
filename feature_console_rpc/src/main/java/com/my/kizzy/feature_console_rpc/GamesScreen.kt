@@ -197,25 +197,45 @@ fun GamesScreen(
                             when (isConsoleRpcRunning) {
                                 true -> {
                                     val rpcToRun = intent.getStringExtra("RPC") ?: lastRunRpcString
-                                    if (rpcToRun.isNotEmpty()) {
+                                    val finalRpc = if (rpcToRun.isNotEmpty()) {
                                         val config = try {
                                             Json.decodeFromString<RpcConfig>(rpcToRun)
                                         } catch (_: Exception) {
                                             null
                                         }
-                                        val effectiveJson = if (config != null && config.details.isNotEmpty() && (config.name == "Xbox" || config.name.isEmpty())) {
-                                            val updated = config.copy(
-                                                name = config.details,
-                                                details = "Playing",
-                                                smallImg = "",
-                                                platform = "desktop"
+                                        if (config != null && (config.name == "Xbox" || config.name.isEmpty()) && config.details.isNotEmpty()) {
+                                            Json.encodeToString(
+                                                config.copy(
+                                                    name = config.details,
+                                                    details = "Playing",
+                                                    platform = ""
+                                                )
                                             )
-                                            Json.encodeToString(updated)
                                         } else rpcToRun
+                                    } else {
+                                        val firstGame = state.games.firstOrNull()
+                                        if (firstGame != null) {
+                                            selected = firstGame.game_title
+                                            Json.encodeToString(
+                                                RpcConfig(
+                                                    name = firstGame.game_title,
+                                                    details = "Playing",
+                                                    timestampsStart = System.currentTimeMillis().toString(),
+                                                    status = "dnd",
+                                                    largeImg = firstGame.large_image ?: "",
+                                                    smallImg = firstGame.small_image,
+                                                    smallText = firstGame.platform,
+                                                    type = "0",
+                                                    platform = "",
+                                                )
+                                            )
+                                        } else ""
+                                    }
 
+                                    if (finalRpc.isNotEmpty()) {
                                         intent.removeExtra("RPC")
-                                        intent.putExtra("RPC", effectiveJson)
-                                        Prefs[Prefs.LAST_RUN_CONSOLE_RPC] = effectiveJson
+                                        intent.putExtra("RPC", finalRpc)
+                                        Prefs[Prefs.LAST_RUN_CONSOLE_RPC] = finalRpc
                                         context.stopService(
                                             Intent(
                                                 context,
@@ -256,9 +276,10 @@ fun GamesScreen(
                                             timestampsStart = System.currentTimeMillis().toString(),
                                             status = "dnd",
                                             largeImg = info.large_image ?: "",
-                                            smallImg = "",
+                                            smallImg = info.small_image,
+                                            smallText = info.platform,
                                             type = "0",
-                                            platform = "desktop",
+                                            platform = "",
                                         )
                                     )
                                     intent.apply {
@@ -266,9 +287,20 @@ fun GamesScreen(
                                         putExtra("RPC", string)
                                     }
                                     Prefs[Prefs.LAST_RUN_CONSOLE_RPC] = string
-                                    if (isConsoleRpcRunning) {
-                                        context.startService(intent)
-                                    }
+                                    isConsoleRpcRunning = true
+                                    context.stopService(
+                                        Intent(
+                                            context,
+                                            AppDetectionService::class.java
+                                        )
+                                    )
+                                    context.stopService(
+                                        Intent(
+                                            context,
+                                            MediaRpcService::class.java
+                                        )
+                                    )
+                                    context.startService(intent)
                                 }
                             }
                         }
@@ -344,9 +376,18 @@ fun SingleChoiceGameItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Playing Game",
+                    text = game.platform.ifEmpty { "Game" },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
+                )
+            }
+            if (game.small_image.isNotEmpty()) {
+                AsyncImage(
+                    model = game.small_image,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape),
+                    contentDescription = game.platform
                 )
             }
         }

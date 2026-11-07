@@ -275,8 +275,18 @@ class KizzyRPC(
 
     suspend fun build() {
         val isGame = type == 0
-        val resolvedLarge = largeImage?.resolveImage(kizzyRepository)
-        val resolvedSmall = smallImage?.resolveImage(kizzyRepository)
+        val resolvedLarge = try {
+            largeImage?.resolveImage(kizzyRepository)
+        } catch (e: Exception) {
+            logger.e("KizzyRPC", "Large image resolution failed: ${e.message}")
+            null
+        }
+        val resolvedSmall = try {
+            smallImage?.resolveImage(kizzyRepository)
+        } catch (e: Exception) {
+            logger.e("KizzyRPC", "Small image resolution failed: ${e.message}")
+            null
+        }
         val assets = if (resolvedLarge != null || resolvedSmall != null) {
             Assets(
                 largeImage = resolvedLarge,
@@ -294,7 +304,6 @@ class KizzyRPC(
                     details = details?.sanitize(),
                     party = party.takeIf { isGame && party != null },
                     type = type,
-                    platform = platform?.sanitize()?.takeIf { isGame },
                     timestamps = Timestamps(
                         start = startTimestamps,
                         end = stopTimestamps
@@ -332,8 +341,18 @@ class KizzyRPC(
         val activityType = commonRpc.type ?: Prefs[CUSTOM_ACTIVITY_TYPE, 0]
         val isGame = activityType == 0
 
-        val resolvedLarge = commonRpc.largeImage?.resolveImage(kizzyRepository)
-        val resolvedSmall = commonRpc.smallImage?.resolveImage(kizzyRepository)
+        val resolvedLarge = try {
+            commonRpc.largeImage?.resolveImage(kizzyRepository)
+        } catch (e: Exception) {
+            logger.e("KizzyRPC", "Large image resolution failed: ${e.message}")
+            null
+        }
+        val resolvedSmall = try {
+            commonRpc.smallImage?.resolveImage(kizzyRepository)
+        } catch (e: Exception) {
+            logger.e("KizzyRPC", "Small image resolution failed: ${e.message}")
+            null
+        }
         val assets = if (resolvedLarge != null || resolvedSmall != null) {
             Assets(
                 largeImage = resolvedLarge,
@@ -364,7 +383,6 @@ class KizzyRPC(
                         details = commonRpc.details?.takeIf { it.isNotEmpty() }?.sanitize(),
                         state = commonRpc.state?.takeIf { it.isNotEmpty() }?.sanitize(),
                         type = activityType,
-                        platform = commonRpc.platform?.sanitize()?.takeIf { isGame },
                         timestamps = time.takeIf { enableTimestamps == true },
                         assets = assets,
                         party = party.takeIf { isGame && party != null },
