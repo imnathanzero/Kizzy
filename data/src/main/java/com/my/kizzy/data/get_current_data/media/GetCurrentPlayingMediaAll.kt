@@ -56,6 +56,7 @@ class GetCurrentPlayingMediaAll @Inject constructor(
             val author = metadata?.let { metadataResolver.getArtistOrAuthor(it) }
             val album = metadata?.let { metadataResolver.getAlbum(it) }
             val bitmap = metadata?.let { metadataResolver.getCoverArt(it) }
+            val artUrl = metadata?.let { metadataResolver.getArtUrl(it) }
             val duration = metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION)
             val position = mediaController.playbackState?.position
             val playbackState = mediaController.playbackState?.state
@@ -73,14 +74,15 @@ class GetCurrentPlayingMediaAll @Inject constructor(
                     mediaController.packageName, context
                 )
 
-                var coverArt: RpcImage? = null
-                if (bitmap != null) {
-                    coverArt = RpcImage.BitmapImage(
+                val coverArt: RpcImage? = when {
+                    bitmap != null -> RpcImage.BitmapImage(
                         context = context,
                         bitmap = bitmap,
                         packageName = mediaController.packageName,
                         title = "${metadata.let { metadataResolver.getAlbumArtists(it) }}|${metadata.let { metadataResolver.getAlbum(it) }?: "unknown"}|${title}"
                     )
+                    artUrl != null -> RpcImage.ExternalImage(artUrl)
+                    else -> null
                 }
 
                 val playbackStateIcon = getPlaybackStateIcon(playbackState ?: PlaybackState.STATE_PAUSED)

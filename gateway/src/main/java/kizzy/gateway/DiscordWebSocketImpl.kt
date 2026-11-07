@@ -251,7 +251,9 @@ open class DiscordWebSocketImpl(
     override suspend fun sendActivity(presence: Presence) {
         if (!isSocketConnectedToAccount()) {
             try {
-                readyDeferred.await()
+                withTimeoutOrNull(10000) {
+                    readyDeferred.await()
+                } ?: return
             } catch (_: CancellationException) {
                 return
             }

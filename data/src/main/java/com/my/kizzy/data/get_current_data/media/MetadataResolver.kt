@@ -24,6 +24,13 @@ class MetadataResolver @Inject constructor() {
         else metadata.getBitmap(MediaMetadata.METADATA_KEY_ART)
     }
 
+    fun getArtUrl(metadata: MediaMetadata): String? {
+        val uri = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
+            ?: metadata.getString(MediaMetadata.METADATA_KEY_ART_URI)
+            ?: metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI)
+        return uri?.takeIf { it.startsWith("http://") || it.startsWith("https://") }
+    }
+
     fun getArtistOrAuthor(metadata: MediaMetadata): String? {
         return if (!metadata.getString(MediaMetadata.METADATA_KEY_ARTIST).isNullOrEmpty()) metadata.getString(
             MediaMetadata.METADATA_KEY_ARTIST

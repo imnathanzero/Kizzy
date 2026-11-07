@@ -115,13 +115,21 @@ class MediaRpcService : Service() {
         val enableTimestamps = Prefs[MEDIA_RPC_ENABLE_TIMESTAMPS, false]
         val playingMedia = getCurrentPlayingMedia()
 
+        val contentText = buildString {
+            if (!playingMedia.details.isNullOrEmpty()) {
+                append(playingMedia.details)
+            }
+            if (!playingMedia.state.isNullOrEmpty()) {
+                if (isNotEmpty()) append(" • ")
+                append(playingMedia.state)
+            }
+        }.ifEmpty { getString(R.string.idling_notification) }
+
         notificationManager.notify(
             Constants.NOTIFICATION_ID,
             notificationBuilder
                 .setContentTitle(playingMedia.name.ifEmpty { getString(R.string.app_name) })
-                .setContentText(
-                    (playingMedia.details ?: "").ifEmpty { getString(R.string.idling_notification) }
-                )
+                .setContentText(contentText)
                 .setLargeIcon(
                     rpcImage = playingMedia.largeImage,
                     context = this@MediaRpcService
@@ -175,20 +183,22 @@ class MediaRpcService : Service() {
     private fun activeSessionsListener(mediaSessions: List<MediaController>?, isEvent: Boolean = true) {
         logger.d("MediaRPC", "Active sessions changed")
 
-        // For some reason, event is occasionally fired before session list is actually updated
-        if (isEvent) runBlocking { delay(1500) }
-
-        if (mediaSessions?.isNotEmpty() == true) {
-            currentMediaController?.unregisterCallback(mediaControllerCallback)
-            currentMediaController = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java)).firstOrNull()
-            currentMediaController?.registerCallback(mediaControllerCallback)
-        } else {
-            currentMediaController?.unregisterCallback(mediaControllerCallback)
-            currentMediaController = null
-        }
-
         scope.coroutineContext.cancelChildren()
-        scope.launch { updatePresence() }
+        scope.launch {
+            if (isEvent) delay(1500)
+            val sessions = mediaSessionManager.getActiveSessions(ComponentName(this@MediaRpcService, NotificationListener::class.java))
+            if (sessions.isNotEmpty()) {
+                currentMediaController?.unregisterCallback(mediaControllerCallback)
+                currentMediaController = sessions.firstOrNull {
+                    Prefs.isMediaAppEnabled(it.packageName)
+                } ?: sessions.firstOrNull()
+                currentMediaController?.registerCallback(mediaControllerCallback)
+            } else {
+                currentMediaController?.unregisterCallback(mediaControllerCallback)
+                currentMediaController = null
+            }
+            updatePresence()
+        }
     }
 
     private inner class MediaControllerCallback: MediaController.Callback() {

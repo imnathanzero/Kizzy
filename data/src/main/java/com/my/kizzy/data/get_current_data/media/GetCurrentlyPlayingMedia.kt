@@ -75,7 +75,7 @@ class GetCurrentPlayingMedia @Inject constructor(
             val title = metadata?.getString(MediaMetadata.METADATA_KEY_TITLE)
             val appName = AppUtils.getAppName(mediaController.packageName)
             val author =
-                if (Prefs[Prefs.MEDIA_RPC_ARTIST_NAME, false])
+                if (Prefs[Prefs.MEDIA_RPC_ARTIST_NAME, true])
                 metadata?.let { metadataResolver.getArtistOrAuthor(it) }
                 else null
             val album =
@@ -83,6 +83,7 @@ class GetCurrentPlayingMedia @Inject constructor(
                 metadata?.let { metadataResolver.getAlbum(it) }
                 else null
             val bitmap = metadata?.let { metadataResolver.getCoverArt(it) }
+            val artUrl = metadata?.let { metadataResolver.getArtUrl(it) }
             val duration = metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION)
             duration?.let {
                 if (it != 0L && mediaController.playbackState?.state == PlaybackState.STATE_PLAYING) timestamps = Timestamps(
@@ -91,20 +92,24 @@ class GetCurrentPlayingMedia @Inject constructor(
                 )
             }
             if (title != null) {
-                largeIcon =
-                    if (Prefs[Prefs.MEDIA_RPC_APP_ICON, false]) RpcImage.ApplicationIcon(
-                        mediaController.packageName, context
-                    ) else null
-                if (bitmap != null) {
-                    smallIcon = largeIcon
-                    smallText = appName
-                    largeIcon = RpcImage.BitmapImage(
+                val appIcon = RpcImage.ApplicationIcon(mediaController.packageName, context)
+                largeIcon = when {
+                    bitmap != null -> RpcImage.BitmapImage(
                         context = context,
                         bitmap = bitmap,
                         packageName = mediaController.packageName,
                         // <Main artist>|<Album>|<Title>
                         title = "${metadata.let { metadataResolver.getAlbumArtists(it) }}|${metadata.let { metadataResolver.getAlbum(it) }?: "unknown"}|${title}"
                     )
+                    artUrl != null -> RpcImage.ExternalImage(artUrl)
+                    else -> appIcon
+                }
+
+                if (bitmap != null || artUrl != null) {
+                    if (Prefs[Prefs.MEDIA_RPC_APP_ICON, false]) {
+                        smallIcon = appIcon
+                        smallText = appName
+                    }
                 }
 
                 if (Prefs[Prefs.MEDIA_RPC_SHOW_PLAYBACK_STATE, false]) {
