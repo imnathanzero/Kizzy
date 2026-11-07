@@ -24,7 +24,9 @@ import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import com.my.kizzy.data.get_current_data.app.GetCurrentlyRunningApp
 import com.my.kizzy.data.get_current_data.media.GetCurrentPlayingMediaAll
 import com.my.kizzy.data.get_current_data.media.RichMediaMetadata
@@ -420,7 +422,7 @@ class ExperimentalRpc : Service() {
             currentMediaController = mediaSessions.firstOrNull {
                 enabledExperimentalApps.contains(it.packageName)
             }
-            currentMediaController?.registerCallback(mediaControllerCallback)
+            currentMediaController?.registerCallback(mediaControllerCallback, Handler(Looper.getMainLooper()))
         }
 
         scope.coroutineContext.cancelChildren()

@@ -22,7 +22,9 @@ import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import com.my.kizzy.data.get_current_data.media.GetCurrentPlayingMedia
@@ -190,7 +192,7 @@ class MediaRpcService : Service() {
                 currentMediaController = sessions.firstOrNull {
                     Prefs.isMediaAppEnabled(it.packageName)
                 } ?: sessions.firstOrNull()
-                currentMediaController?.registerCallback(mediaControllerCallback)
+                currentMediaController?.registerCallback(mediaControllerCallback, Handler(Looper.getMainLooper()))
             } else {
                 currentMediaController?.unregisterCallback(mediaControllerCallback)
                 currentMediaController = null
