@@ -48,6 +48,10 @@ open class DiscordWebSocketImpl(
         get() = SupervisorJob() + Dispatchers.Default
 
     override suspend fun connect() {
+        if (isSocketConnectedToAccount()) {
+            logger.i("Gateway", "Already connected to gateway")
+            return
+        }
         if (readyDeferred.isCompleted) {
             readyDeferred = CompletableDeferred()
         }

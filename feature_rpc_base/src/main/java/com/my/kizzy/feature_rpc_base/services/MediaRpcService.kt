@@ -145,8 +145,9 @@ class MediaRpcService : Service() {
                     return
                 }
                 kizzyRPC.apply {
+                    clearButtons()
                     setName(playingMedia.name)
-                    setType(Prefs[Prefs.CUSTOM_ACTIVITY_TYPE, 0])
+                    setType(playingMedia.type ?: 2)
                     setDetails(playingMedia.details)
                     setState(playingMedia.state)
                     setStartTimestamps(if (enableTimestamps) playingMedia.time?.start else null)

@@ -85,6 +85,7 @@ class CustomRpcService : Service() {
                 notificationManager.notify(
                     Constants.NOTIFICATION_ID,
                     notificationBuilder
+                        .setContentText(rpcData?.name ?: "")
                         .setLargeIcon(
                             rpcImage = rpcData?.largeImg?.toRpcImage(),
                             context = this@CustomRpcService
@@ -93,6 +94,7 @@ class CustomRpcService : Service() {
                 )
 
                 kizzyRPC.apply {
+                    clearButtons()
                     rpcData?.let {
                         setName(it.name.ifEmpty { "" })
                         setDetails(it.details.ifEmpty { null })

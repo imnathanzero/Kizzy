@@ -115,6 +115,7 @@ class GetCurrentPlayingMedia @Inject constructor(
                 return if (Prefs[Prefs.MEDIA_RPC_SHOW_SONG_AS_TITLE, false]) {
                     CommonRpc(
                         name = title,
+                        type = 2,
                         details = author,
                         state = album,
                         largeImage = largeIcon,
@@ -127,6 +128,7 @@ class GetCurrentPlayingMedia @Inject constructor(
                 } else {
                     CommonRpc(
                         name = appName,
+                        type = 2,
                         details = title,
                         state = author,
                         largeImage = largeIcon,

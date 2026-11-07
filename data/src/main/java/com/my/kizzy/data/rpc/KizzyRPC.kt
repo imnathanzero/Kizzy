@@ -210,6 +210,12 @@ class KizzyRPC(
         return this
     }
 
+    fun clearButtons(): KizzyRPC {
+        buttons.clear()
+        buttonUrl.clear()
+        return this
+    }
+
     /**
      * Button1 text
      * @param button1_Text

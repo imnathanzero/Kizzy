@@ -168,8 +168,12 @@ class AppDetectionService : Service() {
 
     private suspend fun handleEnabledPackage(packageName: String, rpcButtons: RpcButtons) {
         if (!kizzyRPC.isRpcRunning()) {
+            val appActivityTypes = Prefs.getAppActivityTypes()
+            val activityType = appActivityTypes[packageName] ?: 0
             kizzyRPC.apply {
+                clearButtons()
                 setName(AppUtils.getAppName(packageName))
+                setType(activityType)
                 setStartTimestamps(System.currentTimeMillis())
                 setStatus(Prefs[Prefs.CUSTOM_ACTIVITY_STATUS, "dnd"])
                 setLargeImage(RpcImage.ApplicationIcon(packageName, this@AppDetectionService))

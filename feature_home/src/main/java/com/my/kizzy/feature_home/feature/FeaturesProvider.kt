@@ -133,26 +133,6 @@ fun homeFeaturesProvider(
             featureDocsLink = ToolTipContent.CONSOLE_RPC_DOCS_LINK
         ),
         HomeFeature(
-            title = stringResource(id = R.string.main_experimentalRpc),
-            icon = R.drawable.ic_dev_rpc,
-            route = Routes.EXPERIMENTAL_RPC,
-            onClick = { navigateTo(it) },
-            isChecked = AppUtils.experimentalRpcRunning(),
-            onCheckedChange = {
-                if (it) {
-                    ctx.stopService(Intent(ctx, MediaRpcService::class.java))
-                    ctx.stopService(Intent(ctx, CustomRpcService::class.java))
-                    ctx.stopService(Intent(ctx, AppDetectionService::class.java))
-                    ctx.startService(Intent(ctx, ExperimentalRpc::class.java))
-                } else
-                    ctx.stopService(Intent(ctx, ExperimentalRpc::class.java))
-            },
-            shape = RoundedCornerShape(20.dp, 44.dp, 20.dp, 44.dp),
-            showSwitch = hasUsageAccess.value && hasNotificationAccess.value && userVerified,
-            tooltipText = stringResource(id = R.string.main_experimentalRpc_details),
-            featureDocsLink = ToolTipContent.EXPERIMENTAL_RPC_DOCS_LINK
-        ),
-        HomeFeature(
             title = stringResource(id = R.string.main_comingSoon),
             icon = R.drawable.ic_info,
             shape = RoundedCornerShape(20.dp, 44.dp, 20.dp, 44.dp),

@@ -95,7 +95,11 @@ fun GamesScreen(
     }
 
     var selected by remember {
-        mutableStateOf(lastRunRpcConfig?.details ?: "")
+        mutableStateOf(
+            lastRunRpcConfig?.let {
+                if (it.name.isNotEmpty() && it.name != "Xbox") it.name else it.details
+            } ?: ""
+        )
     }
 
     val context = LocalContext.current
@@ -193,12 +197,26 @@ fun GamesScreen(
                             isConsoleRpcRunning = !isConsoleRpcRunning
                             when (isConsoleRpcRunning) {
                                 true -> {
-                                    if (!intent.hasExtra("RPC") && lastRunRpcString.isNotEmpty()) {
-                                        intent.putExtra("RPC", lastRunRpcString)
-                                    }
-                                    if (intent.hasExtra("RPC")) {
-                                        Prefs[Prefs.LAST_RUN_CONSOLE_RPC] =
-                                            intent.getStringExtra("RPC")
+                                    val rpcToRun = intent.getStringExtra("RPC") ?: lastRunRpcString
+                                    if (rpcToRun.isNotEmpty()) {
+                                        val config = try {
+                                            Json.decodeFromString<RpcConfig>(rpcToRun)
+                                        } catch (_: Exception) {
+                                            null
+                                        }
+                                        val effectiveJson = if (config != null && config.details.isNotEmpty() && (config.name == "Xbox" || config.name.isEmpty())) {
+                                            val updated = config.copy(
+                                                name = config.details,
+                                                details = "Playing",
+                                                smallImg = "",
+                                                platform = "desktop"
+                                            )
+                                            Json.encodeToString(updated)
+                                        } else rpcToRun
+
+                                        intent.removeExtra("RPC")
+                                        intent.putExtra("RPC", effectiveJson)
+                                        Prefs[Prefs.LAST_RUN_CONSOLE_RPC] = effectiveJson
                                         context.stopService(
                                             Intent(
                                                 context,
@@ -240,18 +258,23 @@ fun GamesScreen(
                                     selected = game.game_title
                                     val string = Json.encodeToString(
                                         RpcConfig(
-                                            name = info.platform,
-                                            details = info.game_title,
+                                            name = info.game_title,
+                                            details = "Playing",
                                             timestampsStart = System.currentTimeMillis().toString(),
                                             status = "dnd",
                                             largeImg = info.large_image ?: "",
-                                            smallImg = info.small_image,
+                                            smallImg = "",
                                             type = "0",
+                                            platform = "desktop",
                                         )
                                     )
                                     intent.apply {
                                         removeExtra("RPC")
                                         putExtra("RPC", string)
+                                    }
+                                    Prefs[Prefs.LAST_RUN_CONSOLE_RPC] = string
+                                    if (isConsoleRpcRunning) {
+                                        context.startService(intent)
                                     }
                                 }
                             }
@@ -327,14 +350,12 @@ fun SingleChoiceGameItem(
                     else MaterialTheme.colorScheme.onSurfaceVariant,
                     overflow = TextOverflow.Ellipsis
                 )
+                Text(
+                    text = "Playing Game",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
             }
-            AsyncImage(
-                model = game.small_image,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                contentDescription = game.platform
-            )
         }
     }
 }
