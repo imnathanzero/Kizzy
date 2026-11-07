@@ -29,19 +29,23 @@ data class GamesResponse(
 )
 
 fun GamesResponse.toGame() : Game {
+    val platformName = when (label.lowercase()) {
+        "nintendo" -> Constants.NINTENDO
+        "wii" -> Constants.WII_U
+        "nintendo-3ds" -> Constants.NINTENDO_3DS
+        "xbox" -> Constants.XBOX
+        else -> ""
+    }
+    val smallImg = when (label.lowercase()) {
+        "nintendo" -> Constants.NINTENDO_LINK
+        "wii" -> Constants.WII_U_LINK
+        "nintendo-3ds" -> Constants.N3DS_LINK
+        "xbox" -> Constants.XBOX_LINK
+        else -> ""
+    }
     return Game(
-        platform = when (label) {
-            "nintendo" -> Constants.NINTENDO
-            "wii" -> Constants.WII_U
-            "nintendo-3ds" -> Constants.NINTENDO_3DS
-            else -> Constants.XBOX
-        },
-        small_image = when (label) {
-            "nintendo" -> Constants.NINTENDO_LINK
-            "wii" -> Constants.WII_U_LINK
-            "nintendo-3ds" -> Constants.N3DS_LINK
-            else -> Constants.XBOX_LINK
-        },
+        platform = platformName,
+        small_image = smallImg,
         large_image = link,
         game_title = title
     )

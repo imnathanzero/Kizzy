@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -98,6 +100,12 @@ fun GamesScreen(
             lastRunRpcConfig?.let {
                 if (it.name.isNotEmpty() && it.name != "Xbox") it.name else it.details
             } ?: ""
+        )
+    }
+
+    var selectedPlatform by remember {
+        mutableStateOf(
+            GamePlatform.fromSavedName(Prefs[Prefs.GAME_RPC_CHOSEN_PLATFORM, GamePlatform.NONE.name])
         )
     }
 
@@ -203,11 +211,14 @@ fun GamesScreen(
                                         } catch (_: Exception) {
                                             null
                                         }
-                                        if (config != null && (config.name == "Xbox" || config.name.isEmpty()) && config.details.isNotEmpty()) {
+                                        if (config != null) {
+                                            val gameTitle = if (config.name.isNotEmpty() && config.name != "Xbox") config.name else config.details
                                             Json.encodeToString(
                                                 config.copy(
-                                                    name = config.details,
+                                                    name = gameTitle,
                                                     details = "Playing",
+                                                    smallImg = selectedPlatform.smallIcon ?: "",
+                                                    smallText = selectedPlatform.smallText ?: "",
                                                     platform = ""
                                                 )
                                             )
@@ -216,19 +227,8 @@ fun GamesScreen(
                                         val firstGame = state.games.firstOrNull()
                                         if (firstGame != null) {
                                             selected = firstGame.game_title
-                                            Json.encodeToString(
-                                                RpcConfig(
-                                                    name = firstGame.game_title,
-                                                    details = "Playing",
-                                                    timestampsStart = System.currentTimeMillis().toString(),
-                                                    status = "dnd",
-                                                    largeImg = firstGame.large_image ?: "",
-                                                    smallImg = firstGame.small_image,
-                                                    smallText = firstGame.platform,
-                                                    type = "0",
-                                                    platform = "",
-                                                )
-                                            )
+                                            val config = buildGameRpcConfig(firstGame, selectedPlatform)
+                                            Json.encodeToString(config)
                                         } else ""
                                     }
 
@@ -262,26 +262,53 @@ fun GamesScreen(
                                 )
                             }
                         }
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(GamePlatform.entries) { platform ->
+                                FilterChip(
+                                    selected = selectedPlatform == platform,
+                                    onClick = {
+                                        selectedPlatform = platform
+                                        Prefs[Prefs.GAME_RPC_CHOSEN_PLATFORM] = platform.name
+                                        val activeGame = state.games.find { it.game_title == selected }
+                                        if (activeGame != null) {
+                                            val newConfig = buildGameRpcConfig(activeGame, platform)
+                                            val newJson = Json.encodeToString(newConfig)
+                                            intent.removeExtra("RPC")
+                                            intent.putExtra("RPC", newJson)
+                                            Prefs[Prefs.LAST_RUN_CONSOLE_RPC] = newJson
+                                            if (isConsoleRpcRunning) {
+                                                context.startService(intent)
+                                            }
+                                        }
+                                    },
+                                    label = { Text(platform.title) },
+                                    leadingIcon = if (selectedPlatform == platform) {
+                                        {
+                                            Icon(
+                                                Icons.Outlined.Check,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    } else null
+                                )
+                            }
+                        }
                         LazyColumn {
                             items(state.games) { game ->
                                 SingleChoiceGameItem(
                                     game = game,
-                                    selected = game.game_title == selected
+                                    selected = game.game_title == selected,
+                                    badgeIcon = selectedPlatform.smallIcon
                                 ) { info ->
                                     selected = game.game_title
-                                    val string = Json.encodeToString(
-                                        RpcConfig(
-                                            name = info.game_title,
-                                            details = "Playing",
-                                            timestampsStart = System.currentTimeMillis().toString(),
-                                            status = "dnd",
-                                            largeImg = info.large_image ?: "",
-                                            smallImg = info.small_image,
-                                            smallText = info.platform,
-                                            type = "0",
-                                            platform = "",
-                                        )
-                                    )
+                                    val config = buildGameRpcConfig(info, selectedPlatform)
+                                    val string = Json.encodeToString(config)
                                     intent.apply {
                                         removeExtra("RPC")
                                         putExtra("RPC", string)
@@ -316,6 +343,7 @@ fun GamesScreen(
 fun SingleChoiceGameItem(
     game: Game,
     selected: Boolean,
+    badgeIcon: String? = null,
     onClick: (game: Game) -> Unit,
 ) {
     ElevatedCard(
@@ -376,18 +404,18 @@ fun SingleChoiceGameItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = game.platform.ifEmpty { "Game" },
+                    text = "Playing Game",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline
                 )
             }
-            if (game.small_image.isNotEmpty()) {
+            if (!badgeIcon.isNullOrEmpty()) {
                 AsyncImage(
-                    model = game.small_image,
+                    model = badgeIcon,
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape),
-                    contentDescription = game.platform
+                    contentDescription = null
                 )
             }
         }

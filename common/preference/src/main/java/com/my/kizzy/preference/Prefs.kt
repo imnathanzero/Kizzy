@@ -139,6 +139,7 @@ object Prefs {
     const val USER_BIO = "user-bio"
     const val USER_NITRO = "user-nitro"
     const val LAST_RUN_CONSOLE_RPC = "last_run_console_rpc"
+    const val GAME_RPC_CHOSEN_PLATFORM = "game_rpc_chosen_platform"
     const val LAST_RUN_CUSTOM_RPC = "last_run_custom_rpc"
     const val LANGUAGE = "language"
     const val ENABLED_APPS = "enabled_apps"
