@@ -1,31 +1,29 @@
-/*
- *
- *  ******************************************************************
- *  *  * Copyright (C) 2022
- *  *  * LoginScreen.kt is part of Kizzy
- *  *  *  and can not be copied and/or distributed without the express
- *  *  * permission of yzziK(Vaibhav)
- *  *  *****************************************************************
- *
- *
- */
-
 package com.my.kizzy.feature_profile.ui.login
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.my.kizzy.feature_profile.getUserInfo
 import com.my.kizzy.feature_profile.ui.component.DiscordLoginButton
 import com.my.kizzy.feature_profile.ui.component.DiscordLoginWebView
+import com.my.kizzy.feature_profile.ui.component.QrLoginSheet
+import com.my.kizzy.feature_profile.ui.component.TokenLoginDialog
 import com.my.kizzy.preference.Prefs
 import com.my.kizzy.preference.Prefs.TOKEN
+import com.my.kizzy.resources.R
 import com.my.kizzy.ui.components.BackButton
 import kotlinx.coroutines.launch
 
@@ -42,12 +40,25 @@ fun LoginScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    fun handleSuccessfulToken(token: String) {
+        Prefs[TOKEN] = token
+        buttonEnabledState = false
+        uiState = LoginUiState.OnLoginCompleted
+        scope.launch {
+            getUserInfo(token, onInfoSaved = {
+                onCompleted()
+            })
+        }
+    }
+
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { },
-                navigationIcon = { BackButton { onBackPressed() } })
+            TopAppBar(
+                title = { },
+                navigationIcon = { BackButton { onBackPressed() } }
+            )
         }
     ) { paddingValues ->
         Box(
@@ -58,7 +69,8 @@ fun LoginScreen(
         ) {
             when (uiState) {
                 LoginUiState.InitialState -> {}
-                LoginUiState.OnLoginClicked -> {
+
+                LoginUiState.OnWebLoginClicked -> {
                     ModalBottomSheet(
                         onDismissRequest = {
                             uiState = LoginUiState.InitialState
@@ -69,26 +81,120 @@ fun LoginScreen(
                         },
                     ) {
                         DiscordLoginWebView {
-                            Prefs[TOKEN] = it
                             scope.launch {
                                 modalBottomSheetState.hide()
-                                uiState = LoginUiState.OnLoginCompleted
-                                getUserInfo(it, onInfoSaved = {
-                                    onCompleted()
-                                })
+                                handleSuccessfulToken(it)
                             }
                         }
                     }
                 }
+
+                LoginUiState.OnQrLoginClicked -> {
+                    QrLoginSheet(
+                        onDismissRequest = {
+                            uiState = LoginUiState.InitialState
+                        },
+                        onTokenReceived = {
+                            handleSuccessfulToken(it)
+                        }
+                    )
+                }
+
+                LoginUiState.OnTokenLoginClicked -> {
+                    TokenLoginDialog(
+                        onDismissRequest = {
+                            uiState = LoginUiState.InitialState
+                        },
+                        onTokenSubmit = {
+                            handleSuccessfulToken(it)
+                        }
+                    )
+                }
+
                 LoginUiState.OnLoginCompleted -> {
-                    buttonEnabledState = false
-                    CircularProgressIndicator()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Loading profile...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
-            DiscordLoginButton(
-                onClick = { uiState = LoginUiState.OnLoginClicked },
-                enabled = buttonEnabledState
-            )
+
+            if (uiState != LoginUiState.OnLoginCompleted) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_discord),
+                        tint = Color.Unspecified,
+                        contentDescription = "Discord Logo",
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(id = R.string.login_with_discord),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Choose your preferred login method",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    DiscordLoginButton(
+                        onClick = { uiState = LoginUiState.OnWebLoginClicked },
+                        enabled = buttonEnabledState
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    FilledTonalButton(
+                        onClick = { uiState = LoginUiState.OnQrLoginClicked },
+                        enabled = buttonEnabledState,
+                        modifier = Modifier.fillMaxWidth(0.85f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.QrCodeScanner,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Login with QR Code")
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedButton(
+                        onClick = { uiState = LoginUiState.OnTokenLoginClicked },
+                        enabled = buttonEnabledState,
+                        modifier = Modifier.fillMaxWidth(0.85f),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Key,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = "Login with Token")
+                    }
+                }
+            }
         }
     }
 }

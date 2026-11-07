@@ -29,8 +29,12 @@ androidx-test-ext-junit = "1.2.1"
 espresso-core = "3.6.1"
 javax = "1"
 kotlinx-serialization-json = "1.6.3"
+zxing = "3.5.3"
 
 [libraries]
+
+# ZXing
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 # Javax
 javax = { module = "javax.inject:javax.inject", version.ref = "javax" }
